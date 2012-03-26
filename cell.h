@@ -14,63 +14,141 @@
 #define __CELL_H__
 
 #include "vector.h"
-#include <GL/gl.h>
+#include "glut/glut.h" 
 
 typedef vec3<int> Point_3;
+
+class Nueron;
+class Soma;
 
 /* Dendrite cell */
 class Dendrite
 {
-public:
-  Dendrite(Point_3& bl, Point_3& tr)
-  {
-    m_bl = bl;
-    m_tr = tr;
-  };
-  ~Dendrite(){};
+  public:
+    Dendrite(Point_3& bl, Point_3& tr)
+    {
+      m_bl = bl;
+      m_tr = tr;
+    };
+    ~Dendrite(){};
 
-private:
-  Point_3 m_bl; //bottom left
-  Point_3 m_tr; //top right
+    //draw a rectangle by 6 quads;
+    void draw()
+    {
+      glBegin(GL_QUADS);
+
+      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
+      glVertex3i(m_tr[0],m_bl[1],m_tr[2]);
+      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
+
+      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
+      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
+
+      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
+      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
+      
+      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
+      
+      glVertex3i(m_tr[0],m_bl[1],m_tr[2]);
+      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
+      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
+      
+      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
+      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
+      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
+      
+      glEnd();
+    }
+
+  private:
+    Point_3 m_bl; //bottom left
+    Point_3 m_tr; //top right
 };
 
 /* Axon cell*/
 class Axon
 {
   public:
-  Axon(Point_3& bl, Point_3& tr)
-  {
-    m_bl = bl;
-    m_tr = tr;
-  };
-  ~Axon(){};
+    Axon(Point_3& bl, Point_3& tr)
+    {
+      m_bl = bl;
+      m_tr = tr;
+    };
+    ~Axon(){};
 
-private:
-  Point_3 m_bl;
-  Point_3 m_tr;
+    //draw a rectangle by 6 quads;
+    void draw()
+    {
+      glBegin(GL_QUADS);
+
+      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
+      glVertex3i(m_tr[0],m_bl[1],m_tr[2]);
+      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
+
+      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
+      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
+
+      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
+      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
+      
+      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
+      
+      glVertex3i(m_tr[0],m_bl[1],m_tr[2]);
+      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
+      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
+      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
+      
+      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
+      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
+      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
+      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
+      
+      glEnd();
+    }
+  private:
+    Point_3 m_bl;
+    Point_3 m_tr;
 };
 
 /* Synapse connections */
 class Synapse
 {
   public:
-	  Synapse(int& from, int& to, Point_3& via, Point_3& pos)
+    Synapse(Nueron* from, Nueron* to, Point_3& via, Point_3& pos)
     {
-      m_from = from;
-      m_to = to;
+      m_from_nueron = from;
+      m_to_nueron = to;
       m_pos = pos;
-	  m_via = via;
+      m_via = via;
       m_rendered = false;
       m_via_point = true;
     };
-	~Synapse(){};
+    ~Synapse(){};
 
-	Synapse(int& from, int& to,Point_3& pos)
+    Synapse(Nueron* from, Nueron* to,Point_3& pos)
     {
-      m_from = from;
-      m_to = to;
+      m_from_nueron = from;
+      m_to_nueron = to;
       m_pos = pos;
-	  m_via = pos;
+      //m_via = pos;
       m_rendered = false;
       m_via_point = false;
     };
@@ -95,24 +173,65 @@ class Synapse
       m_via_point = status;  
     }
 
-	Point_3 via_point()
-	{
-		if(m_via_point)
-			return m_via;
-		else 
-			return m_pos;
-	};
+    Point_3 via_point()
+    {
+      if(m_via_point)
+        return m_via;
+      else 
+        return m_pos;
+    };
 
-	Point_3 pos()
-	{
-		return m_pos;
-	};
+    Point_3 pos()
+    {
+      return m_pos;
+    };
+
+    //assume the order of lines are fixed.
+    void draw()
+    {
+      glBegin(GL_LINE_STRIP);
+
+      // FROM to SYNAPSE
+      Point_3 from_center = m_from_nueron->soma()->get_position();
+      glVertex3i(from_center[0],from_center[1],from_center[2]);
+      glVertex3i(m_pos[0],m_pos[1],m_pos[2]);  
+
+      // SYNAPSE to VIA (if any)
+      if(m_via_point){
+        glVertex3i(m_via[0],m_via[1],m_via[2]);
+      }
+      
+      // to TO
+      Point_3 to_center = m_to_nueron->soma()->get_position();
+      glVertex3i(to_center[0],to_center[1],to_center[2]);
+      glEnd();
+    }
+
+    // enchance the effective
+    void draw_enhanced()
+    {
+      glPushMatrix();
+      glLoadIdentity();
+      glTranslatef(m_pos[0],m_pos[1],m_pos[2]);
+      glutSolidSphere(0.05,8,8);
+      glPopMatrix();
+
+      if (m_via_point){
+        glPushMatrix();
+        glLoadIdentity();
+        glTranslatef(m_via[0],m_via[1],m_via[2]);
+        glutSolidSphere(0.02,8,8);
+        glPopMatrix();
+      }
+    }
+  
 
   private:
-    int m_from;
-    int m_to;
+    Nueron *m_from_nueron;
+    Nueron *m_to_nueron;
+
     Point_3 m_pos;
-	Point_3 m_via;
+    Point_3 m_via;
     bool m_rendered;
     bool m_via_point;
 };
@@ -126,7 +245,7 @@ class Soma
     {
       m_pos = pos;
     };
-	~Soma(){};
+    ~Soma(){};
 
     void set_position(const Point_3& pos)
     {
@@ -136,6 +255,15 @@ class Soma
     Point_3& get_position()
     {
       return m_pos;
+    }
+
+    void draw()
+    {
+      glPushMatrix();
+      glLoadIdentity();
+      glTranslatef(m_pos[0],m_pos[1],m_pos[2]);
+      glutSolidSphere(0.1,8,8);
+      glPopMatrix();
     }
 
   private:
@@ -152,15 +280,15 @@ class Soma
 class Nueron
 {
   public:
-    Nueron();
+	Nueron(){};
     ~Nueron(){
       delete m_soma;
-	  
-	  for (int i = 0; i < m_dendrites.size(); ++i)
-		  delete m_dendrites[i];
 
-	  for (int i = 0; i < m_axons.size(); ++i)
-		  delete m_axons[i];
+      for (int i = 0; i < m_dendrites.size(); ++i)
+        delete m_dendrites[i];
+
+      for (int i = 0; i < m_axons.size(); ++i)
+        delete m_axons[i];
     };
 
     Nueron(int& type, Point_3& pos, int& axon_num, int& den_num)
@@ -214,13 +342,36 @@ class Nueron
     int& id()
     {
       return m_id;
+    };
+
+    Soma* soma()
+    {
+      return m_soma;
+    }
+
+    //draw soma;
+    void draw_soma()
+    {
+      m_soma->draw();
+    };
+
+    void draw_dendrites()
+    {
+      for(int i = 0; i < m_dendrites.size(); ++i)
+        m_dendrites[i]->draw();
+    }
+
+    void draw_axons()
+    {
+      for (int i = 0; i < m_axons.size(); ++i)
+        m_axons[i]->draw();
     }
 
   private:
     // ouput and input synapses;
     std::vector<Synapse*>    m_output;
     std::vector<Synapse*>    m_input;
-    
+
     Soma* m_soma; //each neuron only has one soma;
     std::vector<Dendrite*> m_dendrites; 
     std::vector<Axon*> m_axons;
