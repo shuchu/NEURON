@@ -12,7 +12,7 @@ NEURON::NEURON(QWidget *parent, Qt::WFlags flags)
 {
 	//setup ui
 	ui.setupUi(this);
-	ui.plainTextEdit->setReadOnly(true); //put the text editor into Read-only
+	//ui.plainTextEdit->setReadOnly(true); //put the text editor into Read-only
 
 	//redirect the std::clog buffer
 	logBuf.open("./log.txt");
@@ -20,6 +20,7 @@ NEURON::NEURON(QWidget *parent, Qt::WFlags flags)
 
 	//create model
 	cellModel = new CellModel();
+	ui.viewer->load_cellModel(cellModel);
 
 	//setup the connections
 	connect(ui.actionLoad,SIGNAL(triggered()),this,SLOT(open()));

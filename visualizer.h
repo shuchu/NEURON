@@ -9,15 +9,17 @@ class Viewer : public QGLViewer
   Q_OBJECT
 
 public:
-    void set_cellModel(CellModel* cm);
+	Viewer(QWidget* parent)	: QGLViewer(parent){};
 
-  protected:
+    void load_cellModel(CellModel* cm);
+
+protected:
     virtual void draw();
     virtual void init();
     virtual QString helpString() const;
 
 private: 
-	CellModel* m_cm;
+	CellModel * m_cm;
 };
   
 

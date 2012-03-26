@@ -13,6 +13,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 
 #include "glut/glut.h"
 #include "cell.h"
@@ -215,9 +216,16 @@ bool CellModel::load_data_from_file(std::string& file_name)
 
 void CellModel::draw_nuerons()
 {  
+
+  //glutWireTeapot(0.5);
+
+  glColor3f(1.0,0.0,0.0);
+  glPushMatrix();
+  glLoadIdentity();
   for (int i = 0; i < m_nuerons.size(); ++i){
     m_nuerons[i]->draw_soma();
   }
+  glPopMatrix();
 };
 
 void CellModel::draw_synapses()

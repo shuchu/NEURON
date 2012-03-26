@@ -20,7 +20,7 @@ QString Viewer::helpString() const
   return text;
 }
 
-void Viewer::set_cellModel(CellModel* cm)
+void Viewer::load_cellModel(CellModel* cm)
 {
 	m_cm = cm;
 };
