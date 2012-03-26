@@ -10,8 +10,10 @@
  *  
  *
 ****************************************************************/
+#ifndef __CELL_H__
+#define __CELL_H__
 
-#include <vector.h>
+#include "vector.h"
 #include <GL/gl.h>
 
 typedef vec3<int> Point_3;
@@ -25,7 +27,7 @@ public:
     m_bl = bl;
     m_tr = tr;
   };
-  ~Dendrite();
+  ~Dendrite(){};
 
 private:
   Point_3 m_bl; //bottom left
@@ -37,11 +39,11 @@ class Axon
 {
   public:
   Axon(Point_3& bl, Point_3& tr)
-  {i
+  {
     m_bl = bl;
     m_tr = tr;
   };
-  ~Axon();
+  ~Axon(){};
 
 private:
   Point_3 m_bl;
@@ -52,15 +54,26 @@ private:
 class Synapse
 {
   public:
-    Synapse(int& from, int& to, Point_3& pos)
+	  Synapse(int& from, int& to, Point_3& via, Point_3& pos)
     {
       m_from = from;
       m_to = to;
       m_pos = pos;
+	  m_via = via;
+      m_rendered = false;
+      m_via_point = true;
+    };
+	~Synapse(){};
+
+	Synapse(int& from, int& to,Point_3& pos)
+    {
+      m_from = from;
+      m_to = to;
+      m_pos = pos;
+	  m_via = pos;
       m_rendered = false;
       m_via_point = false;
     };
-    ~Synapse();
 
     bool is_via_point()
     {
@@ -82,10 +95,24 @@ class Synapse
       m_via_point = status;  
     }
 
+	Point_3 via_point()
+	{
+		if(m_via_point)
+			return m_via;
+		else 
+			return m_pos;
+	};
+
+	Point_3 pos()
+	{
+		return m_pos;
+	};
+
   private:
     int m_from;
     int m_to;
     Point_3 m_pos;
+	Point_3 m_via;
     bool m_rendered;
     bool m_via_point;
 };
@@ -95,11 +122,11 @@ class Synapse
 class Soma
 {
   public:
-    Soma(Point& pos)
+    Soma(Point_3& pos)
     {
       m_pos = pos;
     };
-    ~Soma();
+	~Soma(){};
 
     void set_position(const Point_3& pos)
     {
@@ -108,7 +135,7 @@ class Soma
 
     Point_3& get_position()
     {
-      return m_post;
+      return m_pos;
     }
 
   private:
@@ -128,6 +155,12 @@ class Nueron
     Nueron();
     ~Nueron(){
       delete m_soma;
+	  
+	  for (int i = 0; i < m_dendrites.size(); ++i)
+		  delete m_dendrites[i];
+
+	  for (int i = 0; i < m_axons.size(); ++i)
+		  delete m_axons[i];
     };
 
     Nueron(int& type, Point_3& pos, int& axon_num, int& den_num)
@@ -156,13 +189,13 @@ class Nueron
     }
 
     // add one dendrite 
-    void add_dendrite(const Dendrite* den)
+    void add_dendrite( Dendrite* den)
     {
       m_dendrites.push_back(den);
     }
 
     // add one axon
-    void add_axon(const Axon* axon)
+    void add_axon( Axon* axon)
     {
       m_axons.push_back(axon);
     }
@@ -185,7 +218,7 @@ class Nueron
 
   private:
     // ouput and input synapses;
-    std::vector<Synapse*>    m_ouput;
+    std::vector<Synapse*>    m_output;
     std::vector<Synapse*>    m_input;
     
     Soma* m_soma; //each neuron only has one soma;
@@ -196,6 +229,4 @@ class Nueron
     int m_type;
 };
 
-
-
-
+#endif

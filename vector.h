@@ -1,3 +1,6 @@
+#ifndef __VECTOR_H__
+#define __VECTOR_H__
+
 template <class T>
 class vec3 {
 public:
@@ -27,15 +30,6 @@ public:
         z = v2;
     }
 
-    explicit vec3( const vec4<T> &u) {
-        for(int i = 0; i < size(); i++) _array[i] = u._array[i];
-    }
-
-    explicit vec3( const vec2<T> &u, T v0) {
-        x = u.x;
-        y = u.y;
-        z = v0;
-    }
     
     const T * get_value() const {
         return _array;
@@ -205,3 +199,5 @@ public:
         T _array[3];     // array access
     };
 };
+
+#endif

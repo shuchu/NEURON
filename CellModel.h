@@ -6,10 +6,14 @@
  *
  * shuchu.han@gmail.com 2012
 ****************************************************************/
+#ifndef __CELLMODEL_H__
+#define __CELLMODEL_H__
 
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iostream>
+
 
 #include "cell.h"
 
@@ -17,19 +21,73 @@
 class CellModel
 {
   public:
-    CellModel();
+	typedef std::vector<Nueron*>::iterator Nueron_iterator;
+	typedef std::vector<Synapse*>::iterator Synapse_iterator;
+
+	CellModel(){};
     ~CellModel();
+
+	Nueron_iterator nuerons_begin();
+	Nueron_iterator nuerons_end();
+	Synapse_iterator synapses_begin();
+	Synapse_iterator synapses_end();
+
+	/*void log(std::string& msg){m_log.append(msg);}
+	void log(const std::string& msg){m_log.append(msg);}
+	std::string& get_log(){return m_log;}
+	void clear_log(){m_log.clear();}*/
 
     int size_of_nuerons();
     int num_of_types();
 
-    bool load_data_from_file(const string& file_name)
+    bool load_data_from_file(std::string& file_name);
 
   private:
-    std::vector<Neuron*> m_nuerons;
+    std::vector<Nueron*> m_nuerons;
+	std::vector<Synapse*> m_synapses;
     std::vector<char> m_types;
-
+	/*std::string m_log;*/
 };
+
+
+CellModel::Nueron_iterator CellModel::nuerons_begin()
+{
+	return m_nuerons.begin();
+}
+
+CellModel::Nueron_iterator CellModel::nuerons_end()
+{
+	return m_nuerons.end();
+}
+
+CellModel::Synapse_iterator CellModel::synapses_begin()
+{
+	return m_synapses.begin();
+}
+
+CellModel::Synapse_iterator CellModel::synapses_end()
+{
+	return m_synapses.end();
+}
+
+CellModel::~CellModel()
+{
+	//release m_nuerons
+	for(Nueron_iterator ni = this->nuerons_begin();
+		ni != this->nuerons_end();
+		ni++)
+	{
+		delete *ni;
+	}
+
+	//release m_synapses;
+	for (Synapse_iterator si = this->synapses_begin();
+		si != this->synapses_end();
+		si++){
+		delete *si;
+	}
+
+}
 
 int CellModel::size_of_nuerons()
 {
@@ -41,7 +99,7 @@ int CellModel::num_of_types()
   return m_types.size();
 }
 
-bool CellModel::load_data_from_file(const string& file_name)
+bool CellModel::load_data_from_file(std::string& file_name)
 {
   //file stream 
   std::ifstream inputFile(file_name,std::ifstream::in);
@@ -50,7 +108,6 @@ bool CellModel::load_data_from_file(const string& file_name)
   if(!inputFile.is_open()) {
     return false;
   } else {
-    std::vector<char> cell_types;   // cell type ---- ID
     int num_of_types; //num of cell types
     int num_of_cells;
 
@@ -65,7 +122,7 @@ bool CellModel::load_data_from_file(const string& file_name)
       char type;
       getline(inputFile,line_buf);
       std::stringstream(line_buf) >> type;
-      cell_types[i] = type;
+      m_types[i] = type;
     }
 
     //load Nueron cells 
@@ -76,7 +133,8 @@ bool CellModel::load_data_from_file(const string& file_name)
       int type,x, y, z, a, d;
 
       // load Nueron
-      inputFile >> type >> x >> y >> z >> a >> d;
+	  getline(inputFile,line_buf);
+	  std::stringstream(line_buf) >> type >> x >> y >> z >> a >> d;
       Nueron* nueron_ptr = new Nueron(type,Point_3(x,y,z),a,d);
       nueron_ptr->set_id(i);
 
@@ -92,7 +150,7 @@ bool CellModel::load_data_from_file(const string& file_name)
       }
 
       // load dendrite
-      for (intj = 0; j < d; j++) {
+      for (int j = 0; j < d; j++) {
         getline(inputFile,line_buf);
         std::stringstream(line_buf) >> x_begin >> x_end >> y_begin \
                                     >> y_end >> z_begin >> z_end;
@@ -111,17 +169,19 @@ bool CellModel::load_data_from_file(const string& file_name)
       std::string s_type; //type of snapse
 
       getline(inputFile,line_buf);
+	  if (line_buf.size() <= 1 )
+		  break;
       std::stringstream ss(line_buf);
       ss >>  s_type;
 
       Synapse* syn;
 
-      if (s_type[0] == "#")
+      if (s_type[0] == '#')
         continue;
       else if (s_type[0] == 'v') {
         // a VIA point  
-        ss >>  from >> to >> x >> y >> z;
-        syn = new Synapse(from,to,Point_3(x,y,z));
+        ss >>  from >> to >> viaX >> viaY >> viaZ >> x >> y >> z;
+        syn = new Synapse(from,to,Point_3(viaX,viaY,viaZ),Point_3(x,y,z));
         syn->set_via_point(true);
       } else {
         // a normal Synapse
@@ -134,11 +194,17 @@ bool CellModel::load_data_from_file(const string& file_name)
         // add output Synapse to Neurons
         m_nuerons[from]->send_synapse(syn);
         m_nuerons[to]->rec_synapse(syn);
-      }
-
+		m_synapses.push_back(syn);
     }  while (!inputFile.eof()) ;
 
-    inputFile.close();
-  }
-};
+	//debug
+  std::cout << "loaded nuerons: " << m_nuerons.size() << std::endl;
+  std::cout << "loaded synapses: " << m_synapses.size() << std::endl;
 
+    inputFile.close();
+  };
+
+  return true;
+}
+
+#endif
