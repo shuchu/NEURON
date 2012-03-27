@@ -14,6 +14,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <climits>
 
 #include "glut/glut.h"
 #include "cell.h"
@@ -25,7 +26,12 @@ class CellModel
     typedef std::vector<Nueron*>::iterator Nueron_iterator;
     typedef std::vector<Synapse*>::iterator Synapse_iterator;
 
-    CellModel(){};
+    CellModel()
+	{
+		////bounding box
+		//bbox_bl = Point_3(INT_MIN,INT_MIN,INT_MIN);
+		//bbox_tr = Point_3(INT_MAX,INT_MAX,INT_MAX);
+	};
     ~CellModel();
 
     Nueron_iterator nuerons_begin();
@@ -42,17 +48,23 @@ class CellModel
     int num_of_types();
 
     bool load_data_from_file(std::string& file_name);
+	void compute_bounding_box();
+	Point_3& bbox_bottom_left();
+	Point_3& bbox_top_right();
 
     //openGL functions;
     void draw_nuerons();
     void draw_synapses();
-
-
+	void draw_AABB();
+	
   private:
     std::vector<Nueron*> m_nuerons;
     std::vector<Synapse*> m_synapses;
     std::vector<char> m_types;
     /*std::string m_log;*/
+
+	Point_3 bbox_bl;
+	Point_3 bbox_tr;
 };
 
 
@@ -216,16 +228,9 @@ bool CellModel::load_data_from_file(std::string& file_name)
 
 void CellModel::draw_nuerons()
 {  
-
-  //glutWireTeapot(0.5);
-
-  glColor3f(1.0,0.0,0.0);
-  glPushMatrix();
-  glLoadIdentity();
   for (int i = 0; i < m_nuerons.size(); ++i){
     m_nuerons[i]->draw_soma();
   }
-  glPopMatrix();
 };
 
 void CellModel::draw_synapses()
@@ -234,5 +239,75 @@ void CellModel::draw_synapses()
     m_synapses[i]->draw();
   }
 };
+
+Point_3& CellModel::bbox_bottom_left()
+{
+	return bbox_bl;
+};
+
+Point_3& CellModel::bbox_top_right()
+{
+	return bbox_tr;
+};
+
+void CellModel::compute_bounding_box()
+{
+	bbox_bl = Point_3(INT_MAX,INT_MAX,INT_MAX);
+	bbox_tr = Point_3(INT_MIN,INT_MIN,INT_MIN);
+
+	//just check soma
+	for (int i = 0; i < m_nuerons.size(); ++i)
+	{
+		Point_3 soma = m_nuerons[i]->soma()->get_position();
+		for (int j = 0; j < 3; ++j){
+			if (soma[j] < bbox_bl[j])
+				bbox_bl[j] = soma[j];
+			if (soma[j] > bbox_tr[j])
+				bbox_tr[j] = soma[j];
+		};
+	};
+
+	//debug
+	std::cout << "botom left: " << bbox_bl[0] << " "
+                                << bbox_bl[1] << " "
+                                << bbox_bl[2] <<std::endl;
+	std::cout << "top right: " << bbox_tr[0] << " "
+                               << bbox_tr[1] << " "
+                               << bbox_tr[2] << std::endl;
+};
+
+void CellModel::draw_AABB()
+{
+	drawCube(bbox_bl[0],bbox_bl[1],bbox_bl[2],\
+		           bbox_tr[0],bbox_tr[1],bbox_tr[2]);
+	/*glBegin(GL_LINE_LOOP);
+	glVertex3i(bbox_bl[0],bbox_bl[1],bbox_bl[2]);
+	glVertex3i(bbox_tr[0],bbox_bl[1],bbox_bl[2]);
+	glVertex3i(bbox_tr[0],bbox_bl[1],bbox_tr[2]);
+	glVertex3i(bbox_bl[0],bbox_bl[1],bbox_tr[2]);
+    glEnd();
+
+	glBegin(GL_LINE_LOOP);
+	glVertex3i(bbox_bl[0],bbox_tr[1],bbox_bl[2]);
+	glVertex3i(bbox_tr[0],bbox_tr[1],bbox_bl[2]);
+	glVertex3i(bbox_tr[0],bbox_tr[1],bbox_tr[2]);
+	glVertex3i(bbox_bl[0],bbox_tr[1],bbox_tr[2]);
+    glEnd();
+	
+	glBegin(GL_LINES);
+	glVertex3i(bbox_bl[0],bbox_bl[1],bbox_bl[2]);
+	glVertex3i(bbox_bl[0],bbox_tr[1],bbox_bl[2]);
+	
+    glVertex3i(bbox_tr[0],bbox_bl[1],bbox_bl[2]);
+	glVertex3i(bbox_tr[0],bbox_tr[1],bbox_bl[2]);
+    
+    glVertex3i(bbox_tr[0],bbox_bl[1],bbox_tr[2]);
+	glVertex3i(bbox_tr[0],bbox_tr[1],bbox_tr[2]);
+	
+    glVertex3i(bbox_bl[0],bbox_bl[1],bbox_tr[2]);
+	glVertex3i(bbox_bl[0],bbox_tr[1],bbox_tr[2]);
+    glEnd();*/
+};
+
 
 #endif

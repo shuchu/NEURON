@@ -14,9 +14,10 @@
 #define __CELL_H__
 
 #include <vector>
+#include "glut/glut.h"
 
 #include "vector.h"
-#include "glut/glut.h" 
+#include "drawShapes.h"
 
 typedef vec3<int> Point_3;
 
@@ -194,18 +195,9 @@ class Synapse
     // enchance the effective
     void draw_enhanced()
     {
-      glPushMatrix();
-      glLoadIdentity();
-      glTranslatef(m_pos[0],m_pos[1],m_pos[2]);
-      glutSolidSphere(0.05,8,8);
-      glPopMatrix();
-
+      drawCube(m_pos[0],m_pos[1],m_pos[2],0.01);
       if (m_via_point){
-        glPushMatrix();
-        glLoadIdentity();
-        glTranslatef(m_via[0],m_via[1],m_via[2]);
-        glutSolidSphere(0.02,8,8);
-        glPopMatrix();
+		  drawCube(m_via[0],m_via[1],m_via[2],0.005);
       }
     }
   
@@ -242,12 +234,8 @@ class Soma
     }
 
     void draw()
-    {
-      glPushMatrix();
-      glLoadIdentity();
-      glTranslatef(m_pos[0],m_pos[1],m_pos[2]);
-      glutSolidSphere(0.1,8,8);
-      glPopMatrix();
+	{
+      drawCube(m_pos[0],m_pos[1],m_pos[2],0.01);
     }
 
   private:

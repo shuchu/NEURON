@@ -38,6 +38,7 @@ void NEURON::open()
 	if (!file_name.isNull())
 	{
 		cellModel->load_data_from_file(file_name.toStdString());
+		cellModel->compute_bounding_box(); //computer the bounding box
 	}
 };
 

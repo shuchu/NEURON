@@ -17,6 +17,8 @@ protected:
     virtual void draw();
     virtual void init();
     virtual QString helpString() const;
+	void draw_box(int x, int y, int z, float scale);
+	void draw_box(int lx, int ly, int lz, int rx, int ry, int rz);
 
 private: 
 	CellModel * m_cm;
