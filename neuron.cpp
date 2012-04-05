@@ -23,7 +23,9 @@ NEURON::NEURON(QWidget *parent, Qt::WFlags flags)
 	ui.viewer->load_cellModel(cellModel);
 
 	//setup the connections
-	connect(ui.actionLoad,SIGNAL(triggered()),this,SLOT(open()));
+	connect(ui.actionLoad,SIGNAL(triggered()),this,SLOT(open())); //file load
+	connect(ui.checkBox_AABB,SIGNAL(stateChanged(int)),ui.viewer,SLOT(aabbBoxState(int))); //aabb 
+
 }
 
 NEURON::~NEURON()

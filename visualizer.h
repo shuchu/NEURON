@@ -20,8 +20,14 @@ protected:
 	void draw_box(int x, int y, int z, float scale);
 	void draw_box(int lx, int ly, int lz, int rx, int ry, int rz);
 
+public slots:
+	void aabbBoxState(int state);
+
 private: 
 	CellModel * m_cm;
+
+	//tags
+	int m_aabb;
 };
   
 

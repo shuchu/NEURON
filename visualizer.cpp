@@ -13,11 +13,6 @@ void Viewer::init()
 //main draw functions
 void Viewer::draw()
 {
-	glColor3f(1.0,0.0,0.0);
-	//glMatrixMode(GL_PROJECTION);
-	/*glPushMatrix();
-	glLoadIdentity();*/
-
 	//Point_3 center = m_cm->bbox_bottom_left();
 	
 	Point_3 length = m_cm->bbox_top_right() - m_cm->bbox_bottom_left();
@@ -31,10 +26,17 @@ void Viewer::draw()
 	glScalef(ss,ss,ss);
 	//glTranslatef(center[0],center[1],center[2]);
 
+	//draw mode
+	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+
 	//debug
 	//std::cout << "ss: " << ss <<std::endl;
+	if( m_aabb != 0 ){
+		glColor3f(1.0,1.0,1.0);
+		m_cm->draw_AABB();
+	}
 
-	m_cm->draw_AABB();
+	glColor3f(1.0,0.0,0.0);
 	m_cm->draw_nuerons();	
 	//glutWireTeapot(1.0);
 	
@@ -94,4 +96,9 @@ void Viewer::draw_box(int lx, int ly, int lz, int rx, int ry, int rz)
     glVertex3i(lx,ly,rz);
 	glVertex3i(lx,ry,rz);
     glEnd();
+};
+
+void Viewer::aabbBoxState(int state)
+{
+	m_aabb = state;
 };

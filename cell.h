@@ -38,39 +38,8 @@ class Dendrite
     //draw a rectangle by 6 quads;
     void draw()
     {
-      glBegin(GL_QUADS);
-
-      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
-      glVertex3i(m_tr[0],m_bl[1],m_tr[2]);
-      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
-
-      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
-      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
-
-      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
-      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
-      
-      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
-      
-      glVertex3i(m_tr[0],m_bl[1],m_tr[2]);
-      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
-      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
-      
-      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
-      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
-      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
-      
-      glEnd();
+	  drawCube(m_bl[0],m_bl[1],m_bl[2], 
+		       m_tr[0],m_tr[1],m_tr[2]);
     }
 
   private:
@@ -92,39 +61,8 @@ class Axon
     //draw a rectangle by 6 quads;
     void draw()
     {
-      glBegin(GL_QUADS);
-
-      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
-      glVertex3i(m_tr[0],m_bl[1],m_tr[2]);
-      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
-
-      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
-      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
-
-      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
-      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
-      
-      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_bl[2]);
-      
-      glVertex3i(m_tr[0],m_bl[1],m_tr[2]);
-      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
-      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
-      glVertex3i(m_tr[0],m_tr[1],m_tr[2]);
-      
-      glVertex3i(m_bl[0],m_bl[1],m_tr[2]);
-      glVertex3i(m_bl[0],m_bl[1],m_bl[2]);
-      glVertex3i(m_bl[0],m_tr[1],m_bl[2]);
-      glVertex3i(m_bl[0],m_tr[1],m_tr[2]);
-      
-      glEnd();
+      drawCube(m_bl[0],m_bl[1],m_bl[2], 
+		       m_tr[0],m_tr[1],m_tr[2]);
     }
   private:
     Point_3 m_bl;
@@ -235,7 +173,8 @@ class Soma
 
     void draw()
 	{
-      drawCube(m_pos[0],m_pos[1],m_pos[2],0.01);
+      drawCube(m_pos[0],m_pos[1],m_pos[2],0.05);
+		//doughnut(m_pos[0],m_pos[1],m_pos[2],1.0,1.0,12,12);
     }
 
   private:

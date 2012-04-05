@@ -280,33 +280,6 @@ void CellModel::draw_AABB()
 {
 	drawCube(bbox_bl[0],bbox_bl[1],bbox_bl[2],\
 		           bbox_tr[0],bbox_tr[1],bbox_tr[2]);
-	/*glBegin(GL_LINE_LOOP);
-	glVertex3i(bbox_bl[0],bbox_bl[1],bbox_bl[2]);
-	glVertex3i(bbox_tr[0],bbox_bl[1],bbox_bl[2]);
-	glVertex3i(bbox_tr[0],bbox_bl[1],bbox_tr[2]);
-	glVertex3i(bbox_bl[0],bbox_bl[1],bbox_tr[2]);
-    glEnd();
-
-	glBegin(GL_LINE_LOOP);
-	glVertex3i(bbox_bl[0],bbox_tr[1],bbox_bl[2]);
-	glVertex3i(bbox_tr[0],bbox_tr[1],bbox_bl[2]);
-	glVertex3i(bbox_tr[0],bbox_tr[1],bbox_tr[2]);
-	glVertex3i(bbox_bl[0],bbox_tr[1],bbox_tr[2]);
-    glEnd();
-	
-	glBegin(GL_LINES);
-	glVertex3i(bbox_bl[0],bbox_bl[1],bbox_bl[2]);
-	glVertex3i(bbox_bl[0],bbox_tr[1],bbox_bl[2]);
-	
-    glVertex3i(bbox_tr[0],bbox_bl[1],bbox_bl[2]);
-	glVertex3i(bbox_tr[0],bbox_tr[1],bbox_bl[2]);
-    
-    glVertex3i(bbox_tr[0],bbox_bl[1],bbox_tr[2]);
-	glVertex3i(bbox_tr[0],bbox_tr[1],bbox_tr[2]);
-	
-    glVertex3i(bbox_bl[0],bbox_bl[1],bbox_tr[2]);
-	glVertex3i(bbox_bl[0],bbox_tr[1],bbox_tr[2]);
-    glEnd();*/
 };
 
 
