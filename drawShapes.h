@@ -7,67 +7,105 @@
 #define M_PI           3.14159265358979323846
 #endif
 
-void drawCube(int lx, int ly, int lz, int rx, int ry, int rz)
+void drawCube(float lx, float ly, float lz, float rx, float ry, float rz)
 {
-	  glBegin(GL_QUADS);
-	  glVertex3i(lx,ly,ly);
-      glVertex3i(lx,ly,rz);
-      glVertex3i(rx,ly,rz);
-      glVertex3i(rx,ly,lz);
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(lx,ly,lz);
+	glVertex3f(rx,ly,lz);
+	glVertex3f(rx,ly,rz);
+	glVertex3f(lx,ly,rz);
+    glEnd();
 
-      glVertex3i(lx,ry,lz);
-      glVertex3i(rx,ry,lz);
-      glVertex3i(rx,ry,rz);
-      glVertex3i(lx,ry,rz);
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(lx,ry,lz);
+	glVertex3f(rx,ry,lz);
+	glVertex3f(rx,ry,rz);
+	glVertex3f(lx,ry,rz);
+    glEnd();
+	
+	glBegin(GL_LINES);
+	glVertex3f(lx,ly,lz);
+	glVertex3f(lx,ry,lz);
+	
+    glVertex3f(rx,ly,lz);
+	glVertex3f(rx,ry,lz);
+    
+    glVertex3f(rx,ly,rz);
+	glVertex3f(rx,ry,rz);
+	
+    glVertex3f(lx,ly,rz);
+	glVertex3f(lx,ry,rz);
+    glEnd();
 
-      glVertex3i(lx,ly,lz);
-      glVertex3i(rx,ly,lz);
-      glVertex3i(rx,ry,lz);
-      glVertex3i(lx,ry,lz);
+	 /* glBegin(GL_QUADS);
+	  glVertex3f(lx,ly,lz);
+      glVertex3f(lx,ly,rz);
+      glVertex3f(rx,ly,rz);
+      glVertex3f(rx,ly,lz);
+
+      glVertex3f(lx,ry,lz);
+      glVertex3f(rx,ry,lz);
+      glVertex3f(rx,ry,rz);
+      glVertex3f(lx,ry,rz);
+
+      glVertex3f(lx,ly,lz);
+      glVertex3f(rx,ly,lz);
+      glVertex3f(rx,ry,lz);
+      glVertex3f(lx,ry,lz);
       
-      glVertex3i(rx,ly,lz);
-      glVertex3i(rx,ly,lz);
-      glVertex3i(rx,ry,rz);
-      glVertex3i(rx,ry,lz);
+      glVertex3f(rx,ly,lz);
+      glVertex3f(rx,ly,lz);
+      glVertex3f(rx,ry,rz);
+      glVertex3f(rx,ry,lz);
       
-      glVertex3i(rx,ly,rz);
-      glVertex3i(lx,ly,rz);
-      glVertex3i(lx,ry,rz);
-      glVertex3i(rx,ry,rz);
+      glVertex3f(rx,ly,rz);
+      glVertex3f(lx,ly,rz);
+      glVertex3f(lx,ry,rz);
+      glVertex3f(rx,ry,rz);
       
-      glVertex3i(lx,ly,rz);
-      glVertex3i(lx,ly,lz);
-      glVertex3i(lx,ry,lz);
-      glVertex3i(lx,ry,rz);
-	  glEnd();
+      glVertex3f(lx,ly,rz);
+      glVertex3f(lx,ly,lz);
+      glVertex3f(lx,ry,lz);
+      glVertex3f(lx,ry,rz);
+	  glEnd();*/
 
-	//glBegin(GL_LINE_LOOP);
-	//glVertex3i(lx,ly,lz);
-	//glVertex3i(rx,ly,lz);
-	//glVertex3i(rx,ly,rz);
-	//glVertex3i(lx,ly,rz);
- //   glEnd();
+	
+};
 
-	//glBegin(GL_LINE_LOOP);
-	//glVertex3i(lx,ry,lz);
-	//glVertex3i(rx,ry,lz);
-	//glVertex3i(rx,ry,rz);
-	//glVertex3i(lx,ry,rz);
- //   glEnd();
-	//
-	//glBegin(GL_LINES);
-	//glVertex3i(lx,ly,lz);
-	//glVertex3i(lx,ry,lz);
-	//
- //   glVertex3i(rx,ly,lz);
-	//glVertex3i(rx,ry,lz);
- //   
- //   glVertex3i(rx,ly,rz);
-	//glVertex3i(rx,ry,rz);
-	//
- //   glVertex3i(lx,ly,rz);
-	//glVertex3i(lx,ry,rz);
- //   glEnd();
+void drawAABB(int lx, int ly, int lz, int rx, int ry, int rz)
+{
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(lx,ly,lz);
+	glVertex3f(rx,ly,lz);
+	glVertex3f(rx,ly,rz);
+	glVertex3f(lx,ly,rz);
+    glEnd();
+
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(lx,ry,lz);
+	glVertex3f(rx,ry,lz);
+	glVertex3f(rx,ry,rz);
+	glVertex3f(lx,ry,rz);
+    glEnd();
+	
+	glBegin(GL_LINES);
+	glVertex3f(lx,ly,lz);
+	glVertex3f(lx,ry,lz);
+	
+    glVertex3f(rx,ly,lz);
+	glVertex3f(rx,ry,lz);
+    
+    glVertex3f(rx,ly,rz);
+	glVertex3f(rx,ry,rz);
+	
+    glVertex3f(lx,ly,rz);
+	glVertex3f(lx,ry,rz);
+    glEnd();
+}
+
+void drawCube(int lx,int ly,int lz,int rx,int ry,int rz)
+{
+	drawCube( (float)lx,(float)ly,(float)lz,(float)rx,(float)ry,(float)rz);
 };
 
 void drawCube(int x, int y, int z, float scale)

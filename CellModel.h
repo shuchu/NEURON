@@ -26,12 +26,7 @@ class CellModel
     typedef std::vector<Nueron*>::iterator Nueron_iterator;
     typedef std::vector<Synapse*>::iterator Synapse_iterator;
 
-    CellModel()
-	{
-		////bounding box
-		//bbox_bl = Point_3(INT_MIN,INT_MIN,INT_MIN);
-		//bbox_tr = Point_3(INT_MAX,INT_MAX,INT_MAX);
-	};
+    CellModel();
     ~CellModel();
 
     Nueron_iterator nuerons_begin();
@@ -39,34 +34,34 @@ class CellModel
     Synapse_iterator synapses_begin();
     Synapse_iterator synapses_end();
 
-    /*void log(std::string& msg){m_log.append(msg);}
-      void log(const std::string& msg){m_log.append(msg);}
-      std::string& get_log(){return m_log;}
-      void clear_log(){m_log.clear();}*/
-
     int size_of_nuerons();
     int num_of_types();
 
     bool load_data_from_file(std::string& file_name);
-	void compute_bounding_box();
-	Point_3& bbox_bottom_left();
-	Point_3& bbox_top_right();
+    void compute_bounding_box();
+    Point_3& bbox_bottom_left();
+    Point_3& bbox_top_right();
+    char nueron_type(int id);
 
     //openGL functions;
-    void draw_nuerons();
+    void draw_nuerons(int magic_number);
     void draw_synapses();
-	void draw_AABB();
-	
+    void draw_AABB();
+
   private:
     std::vector<Nueron*> m_nuerons;
     std::vector<Synapse*> m_synapses;
     std::vector<char> m_types;
     /*std::string m_log;*/
 
-	Point_3 bbox_bl;
-	Point_3 bbox_tr;
+    Point_3 bbox_bl;
+    Point_3 bbox_tr;
 };
 
+CellModel::CellModel()
+{
+	
+}
 
 CellModel::Nueron_iterator CellModel::nuerons_begin()
 {
@@ -162,7 +157,7 @@ bool CellModel::load_data_from_file(std::string& file_name)
         getline(inputFile,line_buf);
         std::stringstream(line_buf) >> x_begin >> x_end >> y_begin \
           >> y_end >> z_begin >> z_end;
-        Axon* axon = new Axon(Point_3(x_begin,y_begin,z_begin),
+        Axon *axon = new Axon(Point_3(x_begin,y_begin,z_begin),
             Point_3(x_end,y_end,z_end));
         nueron_ptr->add_axon(axon);
       }
@@ -172,7 +167,7 @@ bool CellModel::load_data_from_file(std::string& file_name)
         getline(inputFile,line_buf);
         std::stringstream(line_buf) >> x_begin >> x_end >> y_begin \
           >> y_end >> z_begin >> z_end;
-        Dendrite* den = new Dendrite(Point_3(x_begin,y_begin,z_begin),
+        Dendrite *den = new Dendrite(Point_3(x_begin,y_begin,z_begin),
             Point_3(x_end,y_end,z_end));
         nueron_ptr->add_dendrite(den);
       }
@@ -226,61 +221,73 @@ bool CellModel::load_data_from_file(std::string& file_name)
   return true;
 };
 
-void CellModel::draw_nuerons()
-{  
-  for (int i = 0; i < m_nuerons.size(); ++i){
-    m_nuerons[i]->draw_soma();
-  }
-};
 
-void CellModel::draw_synapses()
-{
-  for (int i = 0; i < m_synapses.size(); ++i){
-    m_synapses[i]->draw();
-  }
-};
+//void CellModel::draw_synapses()
+//{
+//  for (int i = 0; i < m_synapses.size(); ++i){
+//    m_synapses[i]->draw();
+//  }
+//};
 
 Point_3& CellModel::bbox_bottom_left()
 {
-	return bbox_bl;
+  return bbox_bl;
 };
 
 Point_3& CellModel::bbox_top_right()
 {
-	return bbox_tr;
+  return bbox_tr;
 };
 
 void CellModel::compute_bounding_box()
 {
-	bbox_bl = Point_3(INT_MAX,INT_MAX,INT_MAX);
-	bbox_tr = Point_3(INT_MIN,INT_MIN,INT_MIN);
+  bbox_bl = Point_3(INT_MAX,INT_MAX,INT_MAX);
+  bbox_tr = Point_3(INT_MIN,INT_MIN,INT_MIN);
 
-	//just check soma
-	for (int i = 0; i < m_nuerons.size(); ++i)
-	{
-		Point_3 soma = m_nuerons[i]->soma()->get_position();
-		for (int j = 0; j < 3; ++j){
-			if (soma[j] < bbox_bl[j])
-				bbox_bl[j] = soma[j];
-			if (soma[j] > bbox_tr[j])
-				bbox_tr[j] = soma[j];
-		};
-	};
+  //just check soma
+  for (int i = 0; i < m_nuerons.size(); ++i)
+  {
+    Point_3 soma = m_nuerons[i]->soma()->get_position();
+    for (int j = 0; j < 3; ++j){
+      if (soma[j] < bbox_bl[j])
+        bbox_bl[j] = soma[j];
+      if (soma[j] > bbox_tr[j])
+        bbox_tr[j] = soma[j];
+    };
+  };
 
-	//debug
-	std::cout << "botom left: " << bbox_bl[0] << " "
-                                << bbox_bl[1] << " "
-                                << bbox_bl[2] <<std::endl;
-	std::cout << "top right: " << bbox_tr[0] << " "
-                               << bbox_tr[1] << " "
-                               << bbox_tr[2] << std::endl;
+  //debug
+  std::cout << "botom left: " << bbox_bl[0] << " "
+    << bbox_bl[1] << " "
+    << bbox_bl[2] <<std::endl;
+  std::cout << "top right: " << bbox_tr[0] << " "
+    << bbox_tr[1] << " "
+    << bbox_tr[2] << std::endl;
 };
 
 void CellModel::draw_AABB()
 {
-	drawCube(bbox_bl[0],bbox_bl[1],bbox_bl[2],\
-		           bbox_tr[0],bbox_tr[1],bbox_tr[2]);
+  drawAABB(bbox_bl[0],bbox_bl[1],bbox_bl[2],\
+      bbox_tr[0],bbox_tr[1],bbox_tr[2]);
 };
 
 
+void CellModel::draw_nuerons(int magic_number)
+{  
+  for (int i = 0; i < m_nuerons.size(); ++i){
+    int type_value = (1 << m_nuerons[i]->type());
+
+    if (magic_number & type_value)
+      m_nuerons[i]->draw_soma();
+  }
+};
+
+char CellModel::nueron_type(int id)
+{
+  char result('?');
+  if (id >=0 && id < m_types.size() )
+    result = m_types[id];
+
+  return result;
+};
 #endif

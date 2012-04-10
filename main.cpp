@@ -1,5 +1,5 @@
-#include "neuron.h"
 #include <QtGui/QApplication>
+#include "neuron.h"
 
 int main(int argc, char *argv[])
 {

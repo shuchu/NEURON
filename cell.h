@@ -38,9 +38,9 @@ class Dendrite
     //draw a rectangle by 6 quads;
     void draw()
     {
-	  drawCube(m_bl[0],m_bl[1],m_bl[2], 
-		       m_tr[0],m_tr[1],m_tr[2]);
-    }
+      drawCube(m_bl[0],m_bl[1],m_bl[2], 
+          m_tr[0],m_tr[1],m_tr[2]);
+    };
 
   private:
     Point_3 m_bl; //bottom left
@@ -62,7 +62,7 @@ class Axon
     void draw()
     {
       drawCube(m_bl[0],m_bl[1],m_bl[2], 
-		       m_tr[0],m_tr[1],m_tr[2]);
+          m_tr[0],m_tr[1],m_tr[2]);
     }
   private:
     Point_3 m_bl;
@@ -128,17 +128,17 @@ class Synapse
     };
 
     //assume the order of lines are fixed.
-    void draw();
+	void draw(bool via_point);
 
     // enchance the effective
     void draw_enhanced()
     {
-      drawCube(m_pos[0],m_pos[1],m_pos[2],0.01);
+      drawCube(m_pos[0],m_pos[1],m_pos[2],1.0);
       if (m_via_point){
-		  drawCube(m_via[0],m_via[1],m_via[2],0.005);
+        drawCube(m_via[0],m_via[1],m_via[2],1.0);
       }
-    }
-  
+    };
+
 
   private:
     Nueron *m_from_nueron;
@@ -172,15 +172,14 @@ class Soma
     }
 
     void draw()
-	{
-      drawCube(m_pos[0],m_pos[1],m_pos[2],0.05);
-		//doughnut(m_pos[0],m_pos[1],m_pos[2],1.0,1.0,12,12);
+    {
+      drawCube(m_pos[0],m_pos[1],m_pos[2],1.0);
     }
 
   private:
-    // ouput and input synapses;
-    std::vector<Synapse*>    m_ouput;
-    std::vector<Synapse*>    m_input;
+    //// ouput and input synapses;
+    //std::vector<Synapse*>    m_ouput;
+    //std::vector<Synapse*>    m_input;
 
     // cell location
     Point_3 m_pos;
@@ -191,7 +190,7 @@ class Soma
 class Nueron
 {
   public:
-	Nueron(){};
+    Nueron(){};
     ~Nueron(){
       delete m_soma;
 
@@ -207,12 +206,6 @@ class Nueron
       m_soma = new Soma(pos);
 
       m_type = type;
-
-      if (axon_num > 0)
-        m_axons.resize(axon_num);
-
-      if (den_num > 0)
-        m_dendrites.resize(den_num);
     };
 
     // receive a synapse signal
@@ -243,6 +236,11 @@ class Nueron
     void set_type(const int& type)
     {
       m_type = type;
+    };
+
+    int type()
+    {
+      return m_type;
     };
 
     void set_id(const int& id)
@@ -278,6 +276,31 @@ class Nueron
         m_axons[i]->draw();
     }
 
+	//draw the input synapses
+	void draw_input_synapse(bool via_flag)
+	{
+		//one soma to another soma
+		//may have via point
+		for(int i = 0; i < m_input.size(); ++i)
+		{
+			m_input[i]->draw(via_flag);
+		}
+	};
+
+	//draw the ouput synapses
+	void draw_output_synapse(bool via_flag)
+	{
+		for (int i = 0; i < m_output.size(); ++i)
+		{
+			m_output[i]->draw(via_flag);
+		}
+	};
+
+	Point_3& position()
+	{
+		return m_soma->get_position();
+	}
+
   private:
     // ouput and input synapses;
     std::vector<Synapse*>    m_output;
@@ -290,5 +313,6 @@ class Nueron
     int m_id;
     int m_type;
 };
+
 
 #endif
