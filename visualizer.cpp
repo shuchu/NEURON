@@ -39,8 +39,9 @@ void Viewer::init()
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);                 // The Type Of Depth Testing To Do
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Really Nice Perspective Calculations
-  
-  setBackgroundColor(QColor(0,71,125));
+  glEnable(GL_CULL_FACE);
+
+  //setBackgroundColor(QColor(0,71,125));
   setTextIsEnabled(false);
 };
 
@@ -73,7 +74,39 @@ void Viewer::draw()
     Nueron* n_ptr = *ni;
     int type = (1 << n_ptr->type());
     if (m_magic_number & type) {
-      glColor4f(1.0,0.0,0.0,1.0);
+		switch (type) {
+		case 1:
+			glColor4i(220,20,60,255);
+		case 2:
+			glColor4i(75,0,130,255);
+		case 4:
+			glColor4i(65,105,225,255);
+		case 8:
+			glColor4i(0,178,238,255);
+		case 16:
+			glColor4i(0,238,118,255);
+		case 32:
+			glColor4i(102,205,0,255);
+		case 64:
+			glColor4i(238,238,0,255);
+		case 128:
+			glColor4i(255,185,15,255);
+		case 256:
+			glColor4i(255,127,36,255);
+		case 512:
+			glColor4i(255,99,71,255);
+		case 1024:
+			glColor4i(238,48,48,255);
+		case 2048:
+			glColor4i(132,132,132,255);
+		default:
+			glColor4f(1.0,0.0,1.0,1.0);
+		}
+      //draw text
+	  //glColor4f(1.0,1.0,1.0,1.0);
+      qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
+      drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
+
       n_ptr->draw_soma();
 
 	  if (m_den){
@@ -96,10 +129,84 @@ void Viewer::draw()
 		  n_ptr->draw_output_synapse(m_syn_via);
 	  }
 
+    }
+  }
+
+}
+
+
+//main draw functions
+void Viewer::fastDraw()
+{
+  //show AABB 
+  if( m_aabb != 0 ){
+    glColor3f(1.0,1.0,1.0);
+    m_cm->draw_AABB();
+  }
+
+  //show different Cells
+ 
+  for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
+      ni != m_cm->nuerons_end(); ni++)
+  {
+    Nueron* n_ptr = *ni;
+    int type = (1 << n_ptr->type());
+    if (m_magic_number & type) {
+		switch (type) {
+		case 1:
+			glColor4i(220,20,60,255);
+		case 2:
+			glColor4i(75,0,130,255);
+		case 4:
+			glColor4i(65,105,225,255);
+		case 8:
+			glColor4i(0,178,238,255);
+		case 16:
+			glColor4i(0,238,118,255);
+		case 32:
+			glColor4i(102,205,0,255);
+		case 64:
+			glColor4i(238,238,0,255);
+		case 128:
+			glColor4i(255,185,15,255);
+		case 256:
+			glColor4i(255,127,36,255);
+		case 512:
+			glColor4i(255,99,71,255);
+		case 1024:
+			glColor4i(238,48,48,255);
+		case 2048:
+			glColor4i(132,132,132,255);
+		default:
+			glColor4f(1.0,1.0,1.0,1.0);
+		}
       //draw text
-	  glColor4f(1.0,1.0,1.0,1.0);
-      qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
-      drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
+	  //glColor4f(1.0,1.0,1.0,1.0);
+      //qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
+      //drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
+
+      n_ptr->draw_soma();
+
+	  if (m_den){
+		  glColor4f(0.0,1.0,0.0,1.0);
+		  n_ptr->draw_dendrites();
+	  }
+
+	  if (m_axon){
+		  glColor4f(0.0,0.0,1.0,1.0);
+		  n_ptr->draw_axons();
+	  }
+
+	  if (m_syn_in){
+		  glColor4f(0.0,0.5,0.5,1.0);
+		 n_ptr->draw_input_synapse(m_syn_via);
+	  };
+
+	  if (m_syn_out){
+		  glColor4f(0.5,0.5,0.0,1.0);
+		  n_ptr->draw_output_synapse(m_syn_via);
+	  }
+
     }
   }
 

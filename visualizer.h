@@ -20,6 +20,7 @@ class Viewer : public QGLViewer
 
   protected:
     virtual void draw();
+	virtual void fastDraw();
     virtual void init();
     virtual QString helpString() const;
     void draw_box(int x, int y, int z, float scale);
