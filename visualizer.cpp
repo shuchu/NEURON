@@ -41,7 +41,14 @@ void Viewer::init()
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Really Nice Perspective Calculations
   glEnable(GL_CULL_FACE);
 
-  //setBackgroundColor(QColor(0,71,125));
+  //antialiasing
+  glEnable(GL_LINE_SMOOTH);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  glHint(GL_LINE_SMOOTH_HINT,GL_DONT_CARE);
+  glLineWidth(1.5);
+
+  setBackgroundColor(QColor(0,71,125));
   setTextIsEnabled(false);
 };
 
@@ -76,31 +83,31 @@ void Viewer::draw()
     if (m_magic_number & type) {
 		switch (type) {
 		case 1:
-			glColor4i(220,20,60,255);
+			glColor4f(0.2,0.3,0.5,1.0); break;
 		case 2:
-			glColor4i(75,0,130,255);
+			glColor4f(0.4,0.1,0.8,1.0); break;
 		case 4:
-			glColor4i(65,105,225,255);
+			glColor4f(0.7,0.3,0.4,1.0); break;
 		case 8:
-			glColor4i(0,178,238,255);
+			glColor4f(0.3,0.4,0.3,1.0); break;
 		case 16:
-			glColor4i(0,238,118,255);
+			glColor4f(0.8,0.9,0.6,1.0); break;
 		case 32:
-			glColor4i(102,205,0,255);
+			glColor4f(0.9,0.8,0.9,1.0); break;
 		case 64:
-			glColor4i(238,238,0,255);
+			glColor4f(0.2,0.1,0.4,1.0); break;
 		case 128:
-			glColor4i(255,185,15,255);
+			glColor4f(0.5,0.2,0.6,1.0); break;
 		case 256:
-			glColor4i(255,127,36,255);
+			glColor4f(0.6,0.3,0.3,1.0); break;
 		case 512:
-			glColor4i(255,99,71,255);
+			glColor4f(0.7,0.4,0.7,1.0); break;
 		case 1024:
-			glColor4i(238,48,48,255);
+			glColor4f(0.1,0.5,0.4,1.0); break;
 		case 2048:
-			glColor4i(132,132,132,255);
+			glColor4f(0.0,0.3,0.9,1.0); break;
 		default:
-			glColor4f(1.0,0.0,1.0,1.0);
+			glColor4f(1.0,1.0,1.0,1.0); break;
 		}
       //draw text
 	  //glColor4f(1.0,1.0,1.0,1.0);
@@ -152,34 +159,6 @@ void Viewer::fastDraw()
     Nueron* n_ptr = *ni;
     int type = (1 << n_ptr->type());
     if (m_magic_number & type) {
-		switch (type) {
-		case 1:
-			glColor4i(220,20,60,255);
-		case 2:
-			glColor4i(75,0,130,255);
-		case 4:
-			glColor4i(65,105,225,255);
-		case 8:
-			glColor4i(0,178,238,255);
-		case 16:
-			glColor4i(0,238,118,255);
-		case 32:
-			glColor4i(102,205,0,255);
-		case 64:
-			glColor4i(238,238,0,255);
-		case 128:
-			glColor4i(255,185,15,255);
-		case 256:
-			glColor4i(255,127,36,255);
-		case 512:
-			glColor4i(255,99,71,255);
-		case 1024:
-			glColor4i(238,48,48,255);
-		case 2048:
-			glColor4i(132,132,132,255);
-		default:
-			glColor4f(1.0,1.0,1.0,1.0);
-		}
       //draw text
 	  //glColor4f(1.0,1.0,1.0,1.0);
       //qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
