@@ -35,6 +35,10 @@ Viewer::Viewer(QWidget* parent)	: QGLViewer(parent)
 //initialization
 void Viewer::init()
 {
+  //restore satte
+  std::cout << "State File name: " << QString(stateFileName()).toStdString() << std::endl;
+  restoreStateFromFile();
+
   glShadeModel(GL_SMOOTH);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);                 // The Type Of Depth Testing To Do
@@ -499,4 +503,17 @@ void Viewer::load_texture()
 	/*for (int i = 0; i < 12; ++i) {
 		std::cout << "tex: "<< i << "value " << m_texture[i] << std::endl;
 	}*/
-}
+};
+
+void Viewer::show_ortho_x(bool state)
+{
+	m_ortho_x = state;
+};
+void Viewer::show_ortho_y(bool state)
+{
+	m_ortho_y = state;
+};
+void Viewer::show_ortho_z(bool state)
+{
+	m_ortho_z = state;
+};

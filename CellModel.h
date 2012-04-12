@@ -142,12 +142,27 @@ bool CellModel::load_data_from_file(std::string& file_name)
     getline(inputFile,line_buf);
     std::stringstream(line_buf) >> num_of_cells;
 
+	//additional code for non-regular cell index
+	//for example, the index of first cell type is 1 but not 0.
+	bool unregular_cell_type(true);
+	int bias(0);
+
     for (int i = 0; i < num_of_cells; i++) {
       int type,x, y, z, a, d;
 
       // load Nueron
       getline(inputFile,line_buf);
       std::stringstream(line_buf) >> type >> x >> y >> z >> a >> d;
+
+	  if (unregular_cell_type){
+		  if (type != 0){
+			bias = type;
+		  }
+	      unregular_cell_type = false;
+	  };
+
+	  type -= bias;
+
       Nueron* nueron_ptr = new Nueron(type,Point_3(x,y,z),a,d);
       nueron_ptr->set_id(i);
 	  nueron_ptr->set_ctype(m_types[type]);

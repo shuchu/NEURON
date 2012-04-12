@@ -53,11 +53,20 @@ class Viewer : public QGLViewer
 	void show_syn_via(bool state); //via point
 	void show_syn_in(int state);
 	void show_syn_out(int state);
+	void show_ortho_x(bool state);
+	void show_ortho_y(bool state);
+	void show_ortho_z(bool state);
+
 
   private: 
     CellModel * m_cm;
     qglviewer::Frame *m_frames;
     GLuint m_texture[12];
+
+	//orthogonal view
+	bool m_ortho_x;
+	bool m_ortho_y;
+	bool m_ortho_z;
 
     //tags
     int m_aabb;
