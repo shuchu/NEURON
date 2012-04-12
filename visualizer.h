@@ -17,10 +17,11 @@ class Viewer : public QGLViewer
     void load_cellModel(CellModel* cm);
 	void build_frames();
 	void update_scene();
+	void load_texture(); // load texture
 
   protected:
     virtual void draw();
-	virtual void fastDraw();
+	//virtual void fastDraw();
     virtual void init();
     virtual QString helpString() const;
     void draw_box(int x, int y, int z, float scale);
@@ -56,6 +57,7 @@ class Viewer : public QGLViewer
   private: 
     CellModel * m_cm;
     qglviewer::Frame *m_frames;
+    GLuint m_texture[12];
 
     //tags
     int m_aabb;

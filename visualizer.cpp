@@ -46,10 +46,25 @@ void Viewer::init()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   glHint(GL_LINE_SMOOTH_HINT,GL_DONT_CARE);
-  glLineWidth(1.5);
+  glLineWidth(1.0);
 
-  setBackgroundColor(QColor(0,71,125));
+  //lighting
+  glEnable(GL_LIGHT0);
+
+  //texture
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+  glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+  glEnable(GL_TEXTURE_2D);
+  
+  glFrontFace(GL_CCW);
+
+  //setBackgroundColor(QColor(0,71,125));
   setTextIsEnabled(false);
+
+  load_texture();
 };
 
 
@@ -73,6 +88,13 @@ void Viewer::draw()
     m_cm->draw_AABB();
   }
 
+  //glDisable(GL_BLEND);
+  //glBindTexture(GL_TEXTURE_2D,m_texture[1]);
+  //drawCubef(0.0,0.0,0.0,1.0,1.0,1.0);
+  //glutSolidCube(1.0);
+  //glEnable(GL_BLEND);
+
+
   //show different Cells
  
   for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
@@ -81,90 +103,71 @@ void Viewer::draw()
     Nueron* n_ptr = *ni;
     int type = (1 << n_ptr->type());
     if (m_magic_number & type) {
+		int tex_id = 0;
 		switch (type) {
 		case 1:
-			glColor4f(0.2,0.3,0.5,1.0); break;
+			//glColor4f(0.2,0.3,0.5,1.0); 
+			tex_id = 0;
+			break;
 		case 2:
-			glColor4f(0.4,0.1,0.8,1.0); break;
+			//glColor4f(0.4,0.1,0.8,1.0); 
+			tex_id = 1;
+			break;
 		case 4:
-			glColor4f(0.7,0.3,0.4,1.0); break;
+			//glColor4f(0.7,0.3,0.4,1.0); 
+			tex_id = 2;
+			break;
 		case 8:
-			glColor4f(0.3,0.4,0.3,1.0); break;
+			//glColor4f(0.3,0.4,0.3,1.0); 
+			tex_id = 3;
+			break;
 		case 16:
-			glColor4f(0.8,0.9,0.6,1.0); break;
+			//glColor4f(0.8,0.9,0.6,1.0); 
+			tex_id = 4;
+			break;
 		case 32:
-			glColor4f(0.9,0.8,0.9,1.0); break;
+			//glColor4f(0.9,0.8,0.9,1.0); 
+			tex_id = 5;
+			break;
 		case 64:
-			glColor4f(0.2,0.1,0.4,1.0); break;
+			//glColor4f(0.2,0.1,0.4,1.0); 
+			tex_id = 6;
+			break;
 		case 128:
-			glColor4f(0.5,0.2,0.6,1.0); break;
+			//glColor4f(0.5,0.2,0.6,1.0); 
+			tex_id = 7;
+			break;
 		case 256:
-			glColor4f(0.6,0.3,0.3,1.0); break;
+			//glColor4f(0.6,0.3,0.3,1.0); 
+			tex_id = 8;
+			break;
 		case 512:
-			glColor4f(0.7,0.4,0.7,1.0); break;
+			//glColor4f(0.7,0.4,0.7,1.0); 
+			tex_id = 9;
+			break;
 		case 1024:
-			glColor4f(0.1,0.5,0.4,1.0); break;
+			//glColor4f(0.1,0.5,0.4,1.0); 
+			tex_id = 10;
+			break;
 		case 2048:
-			glColor4f(0.0,0.3,0.9,1.0); break;
+			//glColor4f(0.0,0.3,0.9,1.0); 
+			tex_id = 11;
+			break;
 		default:
-			glColor4f(1.0,1.0,1.0,1.0); break;
+			//glColor4f(1.0,1.0,1.0,1.0); 
+			tex_id = 0; break;
 		}
-      //draw text
-	  //glColor4f(1.0,1.0,1.0,1.0);
-      qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
-      drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
-
-      n_ptr->draw_soma();
-
-	  if (m_den){
-		  glColor4f(0.0,1.0,0.0,1.0);
-		  n_ptr->draw_dendrites();
-	  }
-
-	  if (m_axon){
-		  glColor4f(0.0,0.0,1.0,1.0);
-		  n_ptr->draw_axons();
-	  }
-
-	  if (m_syn_in){
-		  glColor4f(0.0,0.5,0.5,1.0);
-		 n_ptr->draw_input_synapse(m_syn_via);
-	  };
-
-	  if (m_syn_out){
-		  glColor4f(0.5,0.5,0.0,1.0);
-		  n_ptr->draw_output_synapse(m_syn_via);
-	  }
-
-    }
-  }
-
-}
-
-
-//main draw functions
-void Viewer::fastDraw()
-{
-  //show AABB 
-  if( m_aabb != 0 ){
-    glColor3f(1.0,1.0,1.0);
-    m_cm->draw_AABB();
-  }
-
-  //show different Cells
- 
-  for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
-      ni != m_cm->nuerons_end(); ni++)
-  {
-    Nueron* n_ptr = *ni;
-    int type = (1 << n_ptr->type());
-    if (m_magic_number & type) {
       //draw text
 	  //glColor4f(1.0,1.0,1.0,1.0);
       //qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
       //drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
-
+	  //Point_3 p = n_ptr->soma()->get_position();
+	  //QGLWidget::renderText(p[0],p[1],p[2],(const QString)n_ptr->ctype());
+      
+	  glEnable(GL_TEXTURE_2D);
+	  glBindTexture(GL_TEXTURE_2D,m_texture[tex_id]);
       n_ptr->draw_soma();
+	  glDisable(GL_TEXTURE_2D);
 
 	  if (m_den){
 		  glColor4f(0.0,1.0,0.0,1.0);
@@ -190,6 +193,8 @@ void Viewer::fastDraw()
   }
 
 }
+
+
 
 //help
 QString Viewer::helpString() const
@@ -464,5 +469,34 @@ void Viewer::load_status()
 	setManipulatedFrame(new qglviewer::ManipulatedFrame());
 	if (!restoreStateFromFile())
 		showEntireScene(); // Previous state cannot be restored: fit camera to scene.
-
 };
+
+//load 12 textures from "images/*.*"
+void Viewer::load_texture()
+{
+	//assume the textures are located at "images/*.*"
+	std::cout << "I assume the textures are located at './images/'" << std::endl;
+	std::cout << "start loading...... " << std::endl;
+
+	// P 
+	m_texture[0] = bindTexture(QPixmap(QString("images/P.png")),GL_TEXTURE_2D);
+	m_texture[1] = bindTexture(QPixmap(QString("images/N.png")),GL_TEXTURE_2D);
+	m_texture[2] = bindTexture(QPixmap(QString("images/G.png")),GL_TEXTURE_2D);
+	m_texture[3] = bindTexture(QPixmap(QString("images/B.png")),GL_TEXTURE_2D);
+	m_texture[4] = bindTexture(QPixmap(QString("images/A.png")),GL_TEXTURE_2D);
+
+	m_texture[5] = bindTexture(QPixmap(QString("images/S.png")),GL_TEXTURE_2D);
+	m_texture[6] = bindTexture(QPixmap(QString("images/T.png")),GL_TEXTURE_2D);
+	m_texture[7] = bindTexture(QPixmap(QString("images/I.png")),GL_TEXTURE_2D);
+	m_texture[8] = bindTexture(QPixmap(QString("images/C.png")),GL_TEXTURE_2D);
+	m_texture[9] = bindTexture(QPixmap(QString("images/M.png")),GL_TEXTURE_2D);
+
+	m_texture[10] = bindTexture(QPixmap(QString("images/R.png")),GL_TEXTURE_2D);
+	m_texture[11] = bindTexture(QPixmap(QString("images/D.png")),GL_TEXTURE_2D);
+
+	std::cout << "finish loading textures. " << std::endl;
+	
+	/*for (int i = 0; i < 12; ++i) {
+		std::cout << "tex: "<< i << "value " << m_texture[i] << std::endl;
+	}*/
+}

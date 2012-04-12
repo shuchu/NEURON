@@ -38,7 +38,7 @@ class Dendrite
     //draw a rectangle by 6 quads;
     void draw()
     {
-      drawCube(m_bl[0],m_bl[1],m_bl[2], 
+      drawCubeLine(m_bl[0],m_bl[1],m_bl[2], 
           m_tr[0],m_tr[1],m_tr[2]);
     };
 
@@ -61,7 +61,7 @@ class Axon
     //draw a rectangle by 6 quads;
     void draw()
     {
-      drawCube(m_bl[0],m_bl[1],m_bl[2], 
+      drawCubeLine(m_bl[0],m_bl[1],m_bl[2], 
           m_tr[0],m_tr[1],m_tr[2]);
     }
   private:
@@ -133,9 +133,9 @@ class Synapse
     // enchance the effective
     void draw_enhanced()
     {
-      drawCube(m_pos[0],m_pos[1],m_pos[2],1.0);
+      drawCubeLine(m_pos[0],m_pos[1],m_pos[2],1.0);
       if (m_via_point){
-        drawCube(m_via[0],m_via[1],m_via[2],1.0);
+        drawCubeLine(m_via[0],m_via[1],m_via[2],1.0);
       }
     };
 
@@ -169,12 +169,12 @@ class Soma
     Point_3& get_position()
     {
       return m_pos;
-    }
+    };
 
     void draw()
     {
-      drawCube(m_pos[0],m_pos[1],m_pos[2],4.0);
-    }
+      drawCube(m_pos[0],m_pos[1],m_pos[2],2.0);
+    };
 
   private:
     //// ouput and input synapses;
@@ -261,7 +261,7 @@ class Nueron
     //draw soma;
     void draw_soma()
     {
-      m_soma->draw();
+		m_soma->draw();
     };
 
     void draw_dendrites()
@@ -301,6 +301,16 @@ class Nueron
 		return m_soma->get_position();
 	}
 
+	void set_ctype(char& c)
+	{
+		m_ctype = c;
+	}
+
+	char& ctype()
+	{
+		return m_ctype;
+	}
+
   private:
     // ouput and input synapses;
     std::vector<Synapse*>    m_output;
@@ -312,6 +322,7 @@ class Nueron
 
     int m_id;
     int m_type;
+	char m_ctype;
 };
 
 

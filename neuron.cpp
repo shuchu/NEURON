@@ -72,6 +72,7 @@ void NEURON::open()
 		cellModel->compute_bounding_box(); //computer the bounding box
 		ui.viewer->update_scene(); //update the scene of viewer as new data coming.
 		//setTextIsEnabled(false);
+	
 	}
 };
 

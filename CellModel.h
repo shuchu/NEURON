@@ -150,6 +150,7 @@ bool CellModel::load_data_from_file(std::string& file_name)
       std::stringstream(line_buf) >> type >> x >> y >> z >> a >> d;
       Nueron* nueron_ptr = new Nueron(type,Point_3(x,y,z),a,d);
       nueron_ptr->set_id(i);
+	  nueron_ptr->set_ctype(m_types[type]);
 
       // load Axon
       int x_begin, x_end, y_begin, y_end, z_begin, z_end;

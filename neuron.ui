@@ -758,6 +758,9 @@
     <property name="autoFillBackground">
      <bool>false</bool>
     </property>
+    <property name="verticalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOn</enum>
+    </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
