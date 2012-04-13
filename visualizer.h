@@ -15,23 +15,26 @@ class Viewer : public QGLViewer
     }
 
     void load_cellModel(CellModel* cm);
-	void build_frames();
-	void update_scene();
-	void load_texture(); // load texture
+    void build_frames();
+    void update_scene();
+    void load_texture(); // load texture
+    void update_aabb();
+	void draw_corner_axis();
 
   protected:
     virtual void draw();
-	//virtual void fastDraw();
+	//virtual void postDraw();
+    //virtual void fastDraw();
     virtual void init();
     virtual QString helpString() const;
     void draw_box(int x, int y, int z, float scale);
     void draw_box(int lx, int ly, int lz, int rx, int ry, int rz);
     void update_magic_number();
-	void update_scene_radius();
-	
-  public slots:
-    void aabbBoxState(int state);
-	void load_status();
+    void update_scene_radius();
+
+    public slots:
+      void aabbBoxState(int state);
+    void load_status();
     void show_P(int state);
     void show_N(int state);
     void show_G(int state);
@@ -46,40 +49,50 @@ class Viewer : public QGLViewer
 
     void show_R(int state);
     void show_D(int state);
-    
+
     void show_den(int state); 
     void show_axon(int state);
-	void show_syn(int state); //synapse
-	void show_syn_via(bool state); //via point
-	void show_syn_in(int state);
-	void show_syn_out(int state);
-	void show_ortho(bool state);
-	void set_clip_x(int value){};
-	void set_clip_y(int value){};
-	void set_clip_z(int value){};
+    void show_syn(int state); //synapse
+    void show_syn_via(bool state); //via point
+    void show_syn_in(int state);
+    void show_syn_out(int state);
+    void show_ortho(bool state);
+    void set_clip_x(int value);
+    void set_clip_y(int value);
+    void set_clip_z(int value);
+    void enable_clip_plane(bool flag);
+    void show_clip_plane(bool flag);
+	void show_axis(bool flag);
 
   private: 
     CellModel * m_cm;
     qglviewer::Frame *m_frames;
     GLuint m_texture[12];
 
-	//orthogonal view
-	bool m_ortho;
+	// axis
+	bool m_axis;
+    
+    //bounding box
+    double aabb_low[3];
+    double aabb_high[3];
 
-	//clip planes
-	bool m_clip_show;
-	float m_clip_x[3];
-	float m_clip_y[3];
-	float m_clip_z[3];
+    //orthogonal view
+    bool m_ortho;
+
+    //clip planes
+    bool m_clip_show;
+    double m_clip_x[4];
+    double m_clip_y[4];
+    double m_clip_z[4];
 
     //tags
     int m_aabb;
     int m_den;
-	int m_axon;
-	int m_syn;
-	bool m_syn_via;
-	int m_syn_in;
-	int m_syn_out;
+    int m_axon;
+    int m_syn;
+    bool m_syn_via;
+    int m_syn_in;
+    int m_syn_out;
 
     //cell types;
     int m_magic_number;

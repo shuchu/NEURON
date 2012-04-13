@@ -12,6 +12,7 @@ Viewer::Viewer(QWidget* parent)	: QGLViewer(parent)
   m_aabb = 0;
   m_den = 0;
   m_axon = 0;
+  m_axis = true;
 
   m_magic_number = 0;
   m_P = 0; // 000000000001
@@ -27,11 +28,18 @@ Viewer::Viewer(QWidget* parent)	: QGLViewer(parent)
   m_R = 0; // 010000000000
   m_D = 0; // 100000000000
 
+  //bounding box
+  aabb_low[0] = aabb_low[1] = aabb_low[2] = 0.0;
+  aabb_high[0] = aabb_high[1] = aabb_high[2] = 1.0;
+
   m_ortho = false;
   m_clip_show = false;
-  m_clip_x[0] = m_clip_x[1] = m_clip_x[2] = 0.0;
-  m_clip_y[0] = m_clip_y[1] = m_clip_y[2] = 0.0;
-  m_clip_z[0] = m_clip_z[1] = m_clip_z[2] = 0.0;
+  m_clip_x[0] = m_clip_x[1] = m_clip_x[2] = m_clip_x[3] = 0.0;
+  m_clip_y[0] = m_clip_y[1] = m_clip_y[2] = m_clip_y[3] = 0.0;
+  m_clip_z[0] = m_clip_z[1] = m_clip_z[2] = m_clip_z[3] = 0.0;
+  m_clip_x[0] = 1.0;
+  m_clip_y[1] = 1.0;
+  m_clip_z[2] = 1.0;
 
   m_cm = NULL;
 };
@@ -47,6 +55,7 @@ void Viewer::init()
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);                 // The Type Of Depth Testing To Do
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Really Nice Perspective Calculations
+  glFrontFace(GL_CCW);
   glEnable(GL_CULL_FACE);
 
   //antialiasing
@@ -57,6 +66,14 @@ void Viewer::init()
   glLineWidth(1.0);
 
   //lighting
+  GLfloat pos[4] = {1000.0,1000.0,1000.0,0.0};
+  GLfloat ka[] = {0.2f,0.2f,0.2f,1.0};
+  GLfloat kd[] = {1.0,1.0,1.0,1.0};
+  GLfloat ks[] = {1.0,1.0,1.0,1.0};
+  glLightfv(GL_LIGHT0,GL_AMBIENT,ka);
+  glLightfv(GL_LIGHT0,GL_DIFFUSE,kd);
+  glLightfv(GL_LIGHT0,GL_SPECULAR,ks);
+  glLightfv(GL_LIGHT0,GL_POSITION,pos);
   glEnable(GL_LIGHT0);
 
   //texture
@@ -66,8 +83,9 @@ void Viewer::init()
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
   glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
   glEnable(GL_TEXTURE_2D);
-  
-  glFrontFace(GL_CCW);
+
+  //clip
+  setManipulatedFrame(new qglviewer::ManipulatedFrame());
 
   //setBackgroundColor(QColor(0,71,125));
   setTextIsEnabled(false);
@@ -89,118 +107,130 @@ void Viewer::draw()
   //float ss = (float) 1/ max_length;
   ////glScalef(ss,ss,ss);
 
- 
+  //show axis
+  if (true) {
+	glPushMatrix();
+	glMultMatrixd(manipulatedFrame()->matrix());
+	QGLViewer::drawAxis(sceneRadius() / 80.0); // Or any scale
+	glPopMatrix();
+  }
+  
+
   //show AABB 
   if( m_aabb != 0 ){
     glColor3f(1.0,1.0,1.0);
     m_cm->draw_AABB();
   }
 
-  
+  //clipping plane
+  glPushMatrix();
+  glMultMatrixd(manipulatedFrame()->matrix());
+  glClipPlane(GL_CLIP_PLANE0, m_clip_x);
+  glClipPlane(GL_CLIP_PLANE1, m_clip_y);
+  glClipPlane(GL_CLIP_PLANE2, m_clip_z);
+  //draw clip planes
+  //
+  glPopMatrix();
+
+  //debug
   //glBindTexture(GL_TEXTURE_2D,m_texture[0]);
   //drawCubef(0.0,0.0,0.0,1.0,1.0,1.0);
 
-
   //show different Cells
- 
   for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
       ni != m_cm->nuerons_end(); ni++)
   {
     Nueron* n_ptr = *ni;
     int type = (1 << n_ptr->type());
     if (m_magic_number & type) {
-		int tex_id = 0;
-		switch (type) {
-		case 1:
-			//glColor4f(0.2,0.3,0.5,1.0); 
-			tex_id = 0;
-			break;
-		case 2:
-			//glColor4f(0.4,0.1,0.8,1.0); 
-			tex_id = 1;
-			break;
-		case 4:
-			//glColor4f(0.7,0.3,0.4,1.0); 
-			tex_id = 2;
-			break;
-		case 8:
-			//glColor4f(0.3,0.4,0.3,1.0); 
-			tex_id = 3;
-			break;
-		case 16:
-			//glColor4f(0.8,0.9,0.6,1.0); 
-			tex_id = 4;
-			break;
-		case 32:
-			//glColor4f(0.9,0.8,0.9,1.0); 
-			tex_id = 5;
-			break;
-		case 64:
-			//glColor4f(0.2,0.1,0.4,1.0); 
-			tex_id = 6;
-			break;
-		case 128:
-			//glColor4f(0.5,0.2,0.6,1.0); 
-			tex_id = 7;
-			break;
-		case 256:
-			//glColor4f(0.6,0.3,0.3,1.0); 
-			tex_id = 8;
-			break;
-		case 512:
-			//glColor4f(0.7,0.4,0.7,1.0); 
-			tex_id = 9;
-			break;
-		case 1024:
-			//glColor4f(0.1,0.5,0.4,1.0); 
-			tex_id = 10;
-			break;
-		case 2048:
-			//glColor4f(0.0,0.3,0.9,1.0); 
-			tex_id = 11;
-			break;
-		default:
-			//glColor4f(1.0,1.0,1.0,1.0); 
-			tex_id = 0; break;
-		}
+      int tex_id = 0;
+      switch (type) {
+        case 1:
+          //glColor4f(0.2,0.3,0.5,1.0); 
+          tex_id = 0;
+          break;
+        case 2:
+          //glColor4f(0.4,0.1,0.8,1.0); 
+          tex_id = 1;
+          break;
+        case 4:
+          //glColor4f(0.7,0.3,0.4,1.0); 
+          tex_id = 2;
+          break;
+        case 8:
+          //glColor4f(0.3,0.4,0.3,1.0); 
+          tex_id = 3;
+          break;
+        case 16:
+          //glColor4f(0.8,0.9,0.6,1.0); 
+          tex_id = 4;
+          break;
+        case 32:
+          //glColor4f(0.9,0.8,0.9,1.0); 
+          tex_id = 5;
+          break;
+        case 64:
+          //glColor4f(0.2,0.1,0.4,1.0); 
+          tex_id = 6;
+          break;
+        case 128:
+          //glColor4f(0.5,0.2,0.6,1.0); 
+          tex_id = 7;
+          break;
+        case 256:
+          //glColor4f(0.6,0.3,0.3,1.0); 
+          tex_id = 8;
+          break;
+        case 512:
+          //glColor4f(0.7,0.4,0.7,1.0); 
+          tex_id = 9;
+          break;
+        case 1024:
+          //glColor4f(0.1,0.5,0.4,1.0); 
+          tex_id = 10;
+          break;
+        case 2048:
+          //glColor4f(0.0,0.3,0.9,1.0); 
+          tex_id = 11;
+          break;
+        default:
+          //glColor4f(1.0,1.0,1.0,1.0); 
+          tex_id = 0; break;
+      }
       //draw text
-	  //glColor4f(1.0,1.0,1.0,1.0);
+      //glColor4f(1.0,1.0,1.0,1.0);
       //qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
       //drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
-	  //Point_3 p = n_ptr->soma()->get_position();
-	  //QGLWidget::renderText(p[0],p[1],p[2],(const QString)n_ptr->ctype());
-      
-	  glEnable(GL_TEXTURE_2D);
-	  glBindTexture(GL_TEXTURE_2D,m_texture[tex_id]);
+      //Point_3 p = n_ptr->soma()->get_position();
+      //QGLWidget::renderText(p[0],p[1],p[2],(const QString)n_ptr->ctype());
+
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D,m_texture[tex_id]);
       n_ptr->draw_soma();
-	  glDisable(GL_TEXTURE_2D);
+      glDisable(GL_TEXTURE_2D);
 
-	  if (m_den){
-		  glColor4f(0.0,1.0,0.0,1.0);
-		  n_ptr->draw_dendrites();
-	  }
+      if (m_den){
+        glColor4f(0.0,1.0,0.0,1.0);
+        n_ptr->draw_dendrites();
+      }
 
-	  if (m_axon){
-		  glColor4f(0.0,0.0,1.0,1.0);
-		  n_ptr->draw_axons();
-	  }
+      if (m_axon){
+        glColor4f(0.0,0.0,1.0,1.0);
+        n_ptr->draw_axons();
+      }
 
-	  if (m_syn_in){
-		  glColor4f(0.0,0.5,0.5,1.0);
-		 n_ptr->draw_input_synapse(m_syn_via);
-	  };
+      if (m_syn_in){
+        glColor4f(0.0,0.5,0.5,1.0);
+        n_ptr->draw_input_synapse(m_syn_via);
+      };
 
-	  if (m_syn_out){
-		  glColor4f(0.5,0.5,0.0,1.0);
-		  n_ptr->draw_output_synapse(m_syn_via);
-	  }
-
+      if (m_syn_out){
+        glColor4f(0.5,0.5,0.0,1.0);
+        n_ptr->draw_output_synapse(m_syn_via);
+      }
     }
   }
-
 }
-
-
 
 //help
 QString Viewer::helpString() const
@@ -220,9 +250,9 @@ void Viewer::build_frames()
   if (m_cm != NULL)
   {
     m_frames = new qglviewer::Frame[m_cm->size_of_nuerons()];
-    
+
     for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
-         ni != m_cm->nuerons_end(); ni++)
+        ni != m_cm->nuerons_end(); ni++)
     {
       Nueron* n_ptr = *ni;
       Soma* s_ptr = n_ptr->soma();
@@ -411,114 +441,273 @@ void Viewer::show_D(int state)
   m_D = state;
   this->update_magic_number();
 };
- 
+
 void Viewer::show_den(int state)
 {
-	m_den = state;
+  m_den = state;
 };
 void Viewer::show_axon(int state)
 {
-	m_axon = state;
+  m_axon = state;
 };
 
 void Viewer::update_scene_radius()
 {
   if (m_cm != NULL) {
-	Point_3 low = m_cm->bbox_bottom_left();
-  	Point_3 high = m_cm->bbox_top_right();
+    Point_3 low = m_cm->bbox_bottom_left();
+    Point_3 high = m_cm->bbox_top_right();
 
-  	int radius = high[0] - low[0];
-  	if (radius < (high[1] - low[1]))
-  		radius = high[1] - low[1];
-  	if (radius < (high[2] - low[2]))
-  	    radius = high[2] - low[2];
-  	setSceneRadius(2.0*double(radius));
-	qglviewer::Vec camera_pos((double)(high[0]+10),(double)(high[1]+10),(double)(high[2]+10));
-	camera()->setPosition(camera_pos);
+    int radius = high[0] - low[0];
+    if (radius < (high[1] - low[1]))
+      radius = high[1] - low[1];
+    if (radius < (high[2] - low[2]))
+      radius = high[2] - low[2];
+    
+	//scene radius
+	setSceneRadius(double(radius));
+    std::cout << "scene radius: " << sceneRadius() << std::endl;
 
-	std::cout << "scene radius: " << sceneRadius() << std::endl;
-	std::cout << "camera position: " << camera_pos.x << " " << camera_pos.y << " " << camera_pos.z  << std::endl;
+	//bounding box
+	//qglviewer::Vec b_min( (double)low[0],(double)low[1],(double)low[2]);
+	//qglviewer::Vec b_max( (double)high[0],(double)high[1],(double)high[2]);
+    //setSceneBoundingBox(b_min,b_max);
+   
+	//update scene center
+	//qglviewer::Vec center(double(high[0]-low[0]),double(high[1]-low[1]),double(high[2]-low[2]));
+	//setSceneCenter(center);
+	
+	showEntireScene();
   }
 };
 
 void Viewer::update_scene()
 {
-	this->build_frames();
-	this->update_scene_radius();
+  this->build_frames();
+  this->update_scene_radius();
+  this->update_aabb();
 };
 
 void Viewer::show_syn(int state)
 {
-	m_syn = state;
+  m_syn = state;
 }; 
-	
+
 void Viewer::show_syn_via(bool state)
 {
-	m_syn_via = state;
+  m_syn_via = state;
 }; 
 
 void Viewer::show_syn_in(int state)
 {
-	m_syn_in = state;
+  m_syn_in = state;
 }
 
 void Viewer::show_syn_out(int state)
 {
-	m_syn_out = state;
+  m_syn_out = state;
 };
 
 void Viewer::load_status()
 {
-		std::cout << "reload the parameters of the scence" << std::endl;
+  std::cout << "reload the parameters of the scence" << std::endl;
 
-	// / Add a manipulated frame to the viewer.
-	setManipulatedFrame(new qglviewer::ManipulatedFrame());
-	if (!restoreStateFromFile())
-		showEntireScene(); // Previous state cannot be restored: fit camera to scene.
+  // / Add a manipulated frame to the viewer.
+  setManipulatedFrame(new qglviewer::ManipulatedFrame());
+  if (!restoreStateFromFile())
+    showEntireScene(); // Previous state cannot be restored: fit camera to scene.
 };
 
 //load 12 textures from "images/*.*"
 void Viewer::load_texture()
 {
-	//assume the textures are located at "images/*.*"
-	std::cout << "I assume the textures are located at './images/'" << std::endl;
-	std::cout << "start loading...... " << std::endl;
+  //assume the textures are located at "images/*.*"
+  std::cout << "I assume the textures are located at './images/'" << std::endl;
+  std::cout << "start loading...... " << std::endl;
 
-	// P 
-	m_texture[0] = bindTexture(QPixmap(QString("images/P.png")),GL_TEXTURE_2D);
-	m_texture[1] = bindTexture(QPixmap(QString("images/N.png")),GL_TEXTURE_2D);
-	m_texture[2] = bindTexture(QPixmap(QString("images/G.png")),GL_TEXTURE_2D);
-	m_texture[3] = bindTexture(QPixmap(QString("images/B.png")),GL_TEXTURE_2D);
-	m_texture[4] = bindTexture(QPixmap(QString("images/A.png")),GL_TEXTURE_2D);
+  // P 
+  m_texture[0] = bindTexture(QPixmap(QString("images/P.png")),GL_TEXTURE_2D);
+  m_texture[1] = bindTexture(QPixmap(QString("images/N.png")),GL_TEXTURE_2D);
+  m_texture[2] = bindTexture(QPixmap(QString("images/G.png")),GL_TEXTURE_2D);
+  m_texture[3] = bindTexture(QPixmap(QString("images/B.png")),GL_TEXTURE_2D);
+  m_texture[4] = bindTexture(QPixmap(QString("images/A.png")),GL_TEXTURE_2D);
 
-	m_texture[5] = bindTexture(QPixmap(QString("images/S.png")),GL_TEXTURE_2D);
-	m_texture[6] = bindTexture(QPixmap(QString("images/T.png")),GL_TEXTURE_2D);
-	m_texture[7] = bindTexture(QPixmap(QString("images/I.png")),GL_TEXTURE_2D);
-	m_texture[8] = bindTexture(QPixmap(QString("images/C.png")),GL_TEXTURE_2D);
-	m_texture[9] = bindTexture(QPixmap(QString("images/M.png")),GL_TEXTURE_2D);
+  m_texture[5] = bindTexture(QPixmap(QString("images/S.png")),GL_TEXTURE_2D);
+  m_texture[6] = bindTexture(QPixmap(QString("images/T.png")),GL_TEXTURE_2D);
+  m_texture[7] = bindTexture(QPixmap(QString("images/I.png")),GL_TEXTURE_2D);
+  m_texture[8] = bindTexture(QPixmap(QString("images/C.png")),GL_TEXTURE_2D);
+  m_texture[9] = bindTexture(QPixmap(QString("images/M.png")),GL_TEXTURE_2D);
 
-	m_texture[10] = bindTexture(QPixmap(QString("images/R.png")),GL_TEXTURE_2D);
-	m_texture[11] = bindTexture(QPixmap(QString("images/D.png")),GL_TEXTURE_2D);
+  m_texture[10] = bindTexture(QPixmap(QString("images/R.png")),GL_TEXTURE_2D);
+  m_texture[11] = bindTexture(QPixmap(QString("images/D.png")),GL_TEXTURE_2D);
 
-	std::cout << "finish loading textures. " << std::endl;
-	
-	/*for (int i = 0; i < 12; ++i) {
-		std::cout << "tex: "<< i << "value " << m_texture[i] << std::endl;
-	}*/
+  std::cout << "finish loading textures. " << std::endl;
+
+  /*for (int i = 0; i < 12; ++i) {
+    std::cout << "tex: "<< i << "value " << m_texture[i] << std::endl;
+    }*/
 };
 
 void Viewer::show_ortho(bool state)
 {
-	m_ortho = state;
+  m_ortho = state;
 
-	//ok, orthogonal view of X
-	if (m_ortho) {
-	 //set view direction
-		qglviewer::Vec v = camera()->viewDirection();
-		std::cout << "current view direction: " << v.x <<" "<< v.y << " " << v.z << std::endl;
-		camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);
-	} else {
-		camera()->setType(qglviewer::Camera::PERSPECTIVE );
-	}
+  //ok, orthogonal view of X
+  if (m_ortho) {
+    //set view direction
+    qglviewer::Vec v = camera()->viewDirection();
+    std::cout << "current view direction: " << v.x <<" "<< v.y << " " << v.z << std::endl;
+    camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);
+  } else {
+    camera()->setType(qglviewer::Camera::PERSPECTIVE );
+  }
 
+};
+
+void Viewer::set_clip_x(int value)
+{
+  m_clip_x[3] = aabb_low[0] + 0.001*value*(aabb_high[0] - aabb_low[0]);
+  m_clip_x[3] -= 0.1f;
+  m_clip_x[3] *= -1.0;
+  std::cout << "Clipping plane X: "
+            << m_clip_x[0] << " "
+            << m_clip_x[1] << " "
+            << m_clip_x[2] << " "
+            << m_clip_x[3] << " "
+            <<std::endl;
+}
+
+void Viewer::set_clip_y(int value)
+{
+  m_clip_y[3] = aabb_low[1] + 0.001*value*(aabb_high[1] - aabb_low[1]);
+  m_clip_y[3] -= 0.1f;
+  m_clip_y[3] *= -1.0;
+  std::cout << "Clipping plane Y: "
+            << m_clip_y[0] << " "
+            << m_clip_y[1] << " "
+            << m_clip_y[2] << " "
+            << m_clip_y[3] << " "
+            <<std::endl;
+}
+
+void Viewer::set_clip_z(int value)
+{
+  m_clip_z[3] = aabb_low[2] + 0.001*value*(aabb_high[2] - aabb_low[2]);
+  m_clip_z[3] += 0.1f;
+  m_clip_z[3] *= -1.0;
+  std::cout << "Clipping plane Z: "
+            << m_clip_z[0] << " "
+            << m_clip_z[1] << " "
+            << m_clip_z[2] << " "
+            << m_clip_z[3] << " "
+            <<std::endl;
+}
+
+//update the AABB
+void Viewer::update_aabb()
+{
+  if (m_cm != NULL){
+    Point_3 low = m_cm->bbox_bottom_left();
+    Point_3 high = m_cm->bbox_top_right();
+
+    for (int i = 0; i < 3; ++i){
+      aabb_low[i] = (double) low[i];
+      aabb_high[i] = (double) high[i];
+    }
+
+	m_clip_x[3] = low[0];
+	m_clip_y[3] = low[1];
+	m_clip_z[3] = low[2];
+  }
+}
+
+
+void Viewer::enable_clip_plane(bool flag)
+{
+  if (flag) {
+    glEnable(GL_CLIP_PLANE0);
+    glEnable(GL_CLIP_PLANE1);
+    glEnable(GL_CLIP_PLANE2);
+  } else {
+    glDisable(GL_CLIP_PLANE0);
+    glDisable(GL_CLIP_PLANE1);
+    glDisable(GL_CLIP_PLANE2);
+  }
+};
+
+void Viewer::show_clip_plane(bool flag)
+{
+  m_clip_show = flag;
+}
+
+void Viewer::draw_corner_axis()
+{
+	int viewport[4];
+	int scissor[4];
+
+	// The viewport and the scissor are changed to fit the lower left
+	// corner. Original values are saved.
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glGetIntegerv(GL_SCISSOR_BOX, scissor);
+
+	// Axis viewport size, in pixels
+	const int size = 150;
+	glViewport(0,0,size,size);
+	glScissor(0,0,size,size);
+
+	// The Z-buffer is cleared to make the axis appear over the
+	// original image.
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	// Tune for best line rendering
+    glDisable(GL_LIGHTING);
+	glLineWidth(1.0);
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(-1, 1, -1, 1, -1, 1);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glMultMatrixd(camera()->orientation().inverse().matrix());
+
+
+	glBegin(GL_LINES);
+	glColor3f(1.0, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, 0.0);
+	glVertex3f(1.0, 0.0, 0.0);
+
+	glColor3f(0.0, 1.0, 0.0);
+	glVertex3f(0.0, 0.0, 0.0);
+	glVertex3f(0.0, 1.0, 0.0);
+	
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(0.0, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, 1.0);
+	glEnd();
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+	glEnable(GL_LIGHTING);
+
+	// The viewport and the scissor are restored.
+	glScissor(scissor[0],scissor[1],scissor[2],scissor[3]);
+	glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+
+};
+
+//void Viewer::postDraw()
+//{
+//  QGLViewer::postDraw();
+//  //draw_corner_axis();
+//};
+
+void Viewer::show_axis(bool flag)
+{
+	m_axis = flag;
 };
