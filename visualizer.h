@@ -53,10 +53,10 @@ class Viewer : public QGLViewer
 	void show_syn_via(bool state); //via point
 	void show_syn_in(int state);
 	void show_syn_out(int state);
-	void show_ortho_x(bool state);
-	void show_ortho_y(bool state);
-	void show_ortho_z(bool state);
-
+	void show_ortho(bool state);
+	void set_clip_x(int value){};
+	void set_clip_y(int value){};
+	void set_clip_z(int value){};
 
   private: 
     CellModel * m_cm;
@@ -64,9 +64,13 @@ class Viewer : public QGLViewer
     GLuint m_texture[12];
 
 	//orthogonal view
-	bool m_ortho_x;
-	bool m_ortho_y;
-	bool m_ortho_z;
+	bool m_ortho;
+
+	//clip planes
+	bool m_clip_show;
+	float m_clip_x[3];
+	float m_clip_y[3];
+	float m_clip_z[3];
 
     //tags
     int m_aabb;

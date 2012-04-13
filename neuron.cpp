@@ -52,7 +52,8 @@ NEURON::NEURON(QWidget *parent, Qt::WFlags flags)
 	connect(ui.checkBox_VIA, SIGNAL(clicked(bool)),ui.viewer,SLOT(show_syn_via(bool))); //via point
 	connect(ui.checkBox_IN, SIGNAL(stateChanged(int)),ui.viewer,SLOT(show_syn_in(int))); //synapse IN
 	connect(ui.checkBox_OUT, SIGNAL(stateChanged(int)),ui.viewer,SLOT(show_syn_out(int))); //synapse OUT
-	connect(ui.checkBox_ShowLetters,SIGNAL(clicked(bool)),ui.viewer,SLOT(setTextIsEnabled(bool)));
+	connect(ui.checkBox_ShowLetters,SIGNAL(clicked(bool)),ui.viewer,SLOT(setTextIsEnabled(bool))); //text
+	connect(ui.checkBox_ortho,SIGNAL(clicked(bool)),ui.viewer,SLOT(show_ortho(bool))); //orthogonal viewerx
 }
 
 NEURON::~NEURON()

@@ -21,7 +21,7 @@
    <string>NEURON</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QGLViewer" name="viewer">
+   <widget class="QGLViewer" name="viewer" native="true">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -331,7 +331,7 @@
       <x>0</x>
       <y>600</y>
       <width>800</width>
-      <height>180</height>
+      <height>90</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -771,63 +771,43 @@
       <x>830</x>
       <y>350</y>
       <width>151</width>
-      <height>80</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="title">
      <string>Orthogonal View</string>
     </property>
-    <widget class="QCheckBox" name="checkBox_ortho_x">
+    <widget class="QCheckBox" name="checkBox_ortho">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>70</width>
+       <width>121</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>X-Axis</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="checkBox_ortho_y">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>70</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Y-Axis</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="checkBox_ortho_z">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>70</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Z-Axis</string>
+      <string>Enable</string>
      </property>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>830</x>
-      <y>440</y>
+      <y>410</y>
       <width>151</width>
       <height>241</height>
      </rect>
     </property>
     <property name="title">
-     <string>GroupBox</string>
+     <string>Clipping</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
     </property>
     <widget class="QSlider" name="verticalSlider_x">
      <property name="geometry">
@@ -945,7 +925,7 @@
      <x>0</x>
      <y>0</y>
      <width>992</width>
-     <height>18</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1066,6 +1046,102 @@
     <hint type="destinationlabel">
      <x>495</x>
      <y>370</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>verticalSlider_x</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>spinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>863</x>
+     <y>548</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>872</x>
+     <y>654</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>verticalSlider_y</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>spinBox_2</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>907</x>
+     <y>577</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>912</x>
+     <y>660</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>verticalSlider_z</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>spinBox_3</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>955</x>
+     <y>566</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>964</x>
+     <y>654</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>verticalSlider_x</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>847</x>
+     <y>658</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>858</x>
+     <y>596</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>verticalSlider_y</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>898</x>
+     <y>663</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>907</x>
+     <y>585</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_3</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>verticalSlider_z</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>950</x>
+     <y>665</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>957</x>
+     <y>559</y>
     </hint>
    </hints>
   </connection>

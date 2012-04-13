@@ -53,188 +53,142 @@ void drawCubeLine(int x, int y, int z, float scale)
 
 void drawCube(float lx, float ly, float lz, float rx, float ry, float rz)
 {
-	/*glBegin(GL_LINE_LOOP);
-	glVertex3f(lx,ly,lz);
-	glVertex3f(rx,ly,lz);
-	glVertex3f(rx,ly,rz);
-	glVertex3f(lx,ly,rz);
-    glEnd();
-
-	glBegin(GL_LINE_LOOP);
-	glVertex3f(lx,ry,lz);
-	glVertex3f(rx,ry,lz);
-	glVertex3f(rx,ry,rz);
-	glVertex3f(lx,ry,rz);
-    glEnd();
 	
-	glBegin(GL_LINES);
-	glVertex3f(lx,ly,lz);
-	glVertex3f(lx,ry,lz);
-	
-    glVertex3f(rx,ly,lz);
-	glVertex3f(rx,ry,lz);
-    
-    glVertex3f(rx,ly,rz);
-	glVertex3f(rx,ry,rz);
-	
-    glVertex3f(lx,ly,rz);
-	glVertex3f(lx,ry,rz);
-    glEnd();*/
-	 glBegin(GL_QUADS);
+	glBegin(GL_QUADS);
 
-	  glNormal3f(0.0,0.0,-1.0);
-	  glTexCoord2f(0.0,0.0);
-	  glVertex3f(lx,ry,rz);
-	  glTexCoord2f(0.0,1.0);
-	  glVertex3f(rx,ry,rz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(rx,ly,rz);
-	  glTexCoord2f(1.0,0.0);
-	  glVertex3f(lx,ly,rz);
+glNormal3f(1.0,0.0,0.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(rx,ly,rz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(rx,ly,lz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(rx,ry,lz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(rx,ry,rz);
+		 
+		
+		 glNormal3f(0.0,1.0,0.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(rx,ry,rz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(rx,ry,lz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(lx,ry,lz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(lx,ry,rz);
+ 
+		glNormal3f(-1.0,0.0,0.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(lx,ry,rz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(lx,ry,lz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(lx,ly,lz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(lx,ly,rz);
+ 
+glNormal3f(0.0,-1.0,0.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(lx,ly,rz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(lx,ly,lz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(rx,ly,lz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(rx,ly,rz);
+ 
+ glNormal3f(0.0,0.0,1.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(lx,ly,rz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(rx,ly,rz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(rx,ry,rz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(lx,ry,rz);
+ 
+ glNormal3f(0.0,0.0,-1.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(rx,ly,lz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(lx,ly,lz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(lx,ry,lz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(rx,ry,lz);
+         glEnd();
 
-	  glNormal3f(0.0,0.0,1.0);
-	  glTexCoord2f(0.0,0.0);
-      glVertex3f(lx,ly,lz);
-	  glTexCoord2f(0.0,1.0);
-      glVertex3f(rx,ly,lz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(rx,ry,lz);
-	  glTexCoord2f(1.0,0.0);
-      glVertex3f(lx,ry,lz);
-	 
-	  glNormal3f(1.0,0.0,0.0);
-	  glTexCoord2f(0.0,0.0);
-      glVertex3f(lx,ry,rz);
-	  glTexCoord2f(1.0,0.0);
-      glVertex3f(lx,ly,rz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(lx,ly,lz);
-	  glTexCoord2f(0.0,1.0);
-      glVertex3f(lx,ry,lz);
-      
-	  glNormal3f(0.0,-1.0,0.0);
-	  glTexCoord2f(0.0,0.0);
-      glVertex3f(lx,ry,rz);
-	  glTexCoord2f(0.0,1.0);
-      glVertex3f(lx,ry,lz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(rx,ry,lz);
-	  glTexCoord2f(1.0,0.0);
-      glVertex3f(rx,ry,rz);
-       
-	  glNormal3f(-1.0,0.0,0.0);
-	  glTexCoord2f(0.0,0.0);
-      glVertex3f(rx,ry,lz);
-	  glTexCoord2f(0.0,1.0);
-      glVertex3f(rx,ly,lz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(rx,ly,rz);
-	  glTexCoord2f(1.0,0.0);
-      glVertex3f(rx,ry,rz);
-      
-	  glNormal3f(0.0,1.0,0.0);
-	  glTexCoord2f(0.0,0.0);
-      glVertex3f(lx,ly,lz);
-	  glTexCoord2f(0.0,1.0);
-      glVertex3f(lx,ly,rz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(rx,ly,rz);
-	  glTexCoord2f(1.0,0.0);
-      glVertex3f(rx,ly,lz);
-	  glEnd();
+
 };
 void drawCubef(float lx, float ly, float lz, float rx, float ry, float rz)
 {
-	/*glBegin(GL_LINE_LOOP);
-	glVertex3f(lx,ly,lz);
-	glVertex3f(rx,ly,lz);
-	glVertex3f(rx,ly,rz);
-	glVertex3f(lx,ly,rz);
-    glEnd();
+	glBegin(GL_QUADS);
 
-	glBegin(GL_LINE_LOOP);
-	glVertex3f(lx,ry,lz);
-	glVertex3f(rx,ry,lz);
-	glVertex3f(rx,ry,rz);
-	glVertex3f(lx,ry,rz);
-    glEnd();
-	
-	glBegin(GL_LINES);
-	glVertex3f(lx,ly,lz);
-	glVertex3f(lx,ry,lz);
-	
-    glVertex3f(rx,ly,lz);
-	glVertex3f(rx,ry,lz);
-    
-    glVertex3f(rx,ly,rz);
-	glVertex3f(rx,ry,rz);
-	
-    glVertex3f(lx,ly,rz);
-	glVertex3f(lx,ry,rz);
-    glEnd();*/
+glNormal3f(1.0,0.0,0.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(rx,ly,rz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(rx,ly,lz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(rx,ry,lz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(rx,ry,rz);
+		 
+		
+		 glNormal3f(0.0,1.0,0.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(rx,ry,rz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(rx,ry,lz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(lx,ry,lz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(lx,ry,rz);
+ 
+		glNormal3f(-1.0,0.0,0.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(lx,ry,rz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(lx,ry,lz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(lx,ly,lz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(lx,ly,rz);
+ 
+glNormal3f(0.0,-1.0,0.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(lx,ly,rz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(lx,ly,lz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(rx,ly,lz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(rx,ly,rz);
+ 
+ glNormal3f(0.0,0.0,1.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(lx,ly,rz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(rx,ly,rz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(rx,ry,rz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(lx,ry,rz);
+ 
+ glNormal3f(0.0,0.0,-1.0);
+         glTexCoord2f(0.0,1.0);
+         glVertex3f(rx,ly,lz);
+         glTexCoord2f(0.0,0.0);
+         glVertex3f(lx,ly,lz);
+         glTexCoord2f(1.0,0.0);
+         glVertex3f(lx,ry,lz);
+         glTexCoord2f(1.0,1.0);
+         glVertex3f(rx,ry,lz);
+ 
+ 
+ 
+         glEnd();
 
-	  glBegin(GL_QUADS);
-
-	  glNormal3f(0.0,0.0,-1.0);
-	  glTexCoord2f(0.0,0.0);
-	  glVertex3f(lx,ry,rz);
-	  glTexCoord2f(0.0,1.0);
-	  glVertex3f(rx,ry,rz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(rx,ly,rz);
-	  glTexCoord2f(1.0,0.0);
-	  glVertex3f(lx,ly,rz);
-
-	  glNormal3f(0.0,0.0,1.0);
-	  glTexCoord2f(0.0,0.0);
-      glVertex3f(lx,ly,lz);
-	  glTexCoord2f(0.0,1.0);
-      glVertex3f(rx,ly,lz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(rx,ry,lz);
-	  glTexCoord2f(1.0,0.0);
-      glVertex3f(lx,ry,lz);
-	 
-	  glNormal3f(1.0,0.0,0.0);
-	  glTexCoord2f(0.0,0.0);
-      glVertex3f(lx,ry,rz);
-	  glTexCoord2f(1.0,0.0);
-      glVertex3f(lx,ly,rz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(lx,ly,lz);
-	  glTexCoord2f(0.0,1.0);
-      glVertex3f(lx,ry,lz);
-      
-	  glNormal3f(0.0,-1.0,0.0);
-	  glTexCoord2f(0.0,0.0);
-      glVertex3f(lx,ry,rz);
-	  glTexCoord2f(0.0,1.0);
-      glVertex3f(lx,ry,lz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(rx,ry,lz);
-	  glTexCoord2f(1.0,0.0);
-      glVertex3f(rx,ry,rz);
-       
-	  glNormal3f(-1.0,0.0,0.0);
-	  glTexCoord2f(0.0,0.0);
-      glVertex3f(rx,ry,lz);
-	  glTexCoord2f(0.0,1.0);
-      glVertex3f(rx,ly,lz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(rx,ly,rz);
-	  glTexCoord2f(1.0,0.0);
-      glVertex3f(rx,ry,rz);
-      
-	  glNormal3f(0.0,1.0,0.0);
-	  glTexCoord2f(0.0,0.0);
-      glVertex3f(lx,ly,lz);
-	  glTexCoord2f(0.0,1.0);
-      glVertex3f(lx,ly,rz);
-	  glTexCoord2f(1.0,1.0);
-	  glVertex3f(rx,ly,rz);
-	  glTexCoord2f(1.0,0.0);
-      glVertex3f(rx,ly,lz);
-	  glEnd();
 };
 
 void drawAABB(int lx, int ly, int lz, int rx, int ry, int rz)

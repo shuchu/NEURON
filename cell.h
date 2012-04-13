@@ -173,7 +173,7 @@ class Soma
 
     void draw()
     {
-      drawCube(m_pos[0],m_pos[1],m_pos[2],2.0);
+      drawCube(m_pos[0],m_pos[1],m_pos[2],1.0);
     };
 
   private:

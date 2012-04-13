@@ -19,15 +19,19 @@ Viewer::Viewer(QWidget* parent)	: QGLViewer(parent)
   m_G = 0; // 000000000100
   m_B = 0; // 000000001000
   m_A = 0; // 000000010000
-
   m_S = 0; // 000000100000
   m_T = 0; // 000001000000
   m_I = 0; // 000010000000
   m_C = 0; // 000100000000
   m_M = 0; // 001000000000
-
   m_R = 0; // 010000000000
   m_D = 0; // 100000000000
+
+  m_ortho = false;
+  m_clip_show = false;
+  m_clip_x[0] = m_clip_x[1] = m_clip_x[2] = 0.0;
+  m_clip_y[0] = m_clip_y[1] = m_clip_y[2] = 0.0;
+  m_clip_z[0] = m_clip_z[1] = m_clip_z[2] = 0.0;
 
   m_cm = NULL;
 };
@@ -93,9 +97,8 @@ void Viewer::draw()
   }
 
   
-  glBindTexture(GL_TEXTURE_2D,m_texture[1]);
-  glutSolidCube(1.0);
-  
+  //glBindTexture(GL_TEXTURE_2D,m_texture[0]);
+  //drawCubef(0.0,0.0,0.0,1.0,1.0,1.0);
 
 
   //show different Cells
@@ -441,7 +444,7 @@ void Viewer::update_scene_radius()
 void Viewer::update_scene()
 {
 	this->build_frames();
-	//this->update_scene_radius();
+	this->update_scene_radius();
 };
 
 void Viewer::show_syn(int state)
@@ -504,27 +507,18 @@ void Viewer::load_texture()
 	}*/
 };
 
-void Viewer::show_ortho_x(bool state)
+void Viewer::show_ortho(bool state)
 {
-	m_ortho_x = state;
+	m_ortho = state;
 
 	//ok, orthogonal view of X
-	if (m_ortho_x) {
+	if (m_ortho) {
 	 //set view direction
-		setViewDirection(qglviewer::Vec(-1.0,0.0,0.0));
-		qglviewer::Vec v = viewDirection();
+		qglviewer::Vec v = camera()->viewDirection();
 		std::cout << "current view direction: " << v.x <<" "<< v.y << " " << v.z << std::endl;
-		camera()->setType(Camera::ORTHOGRAPHIC);
+		camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);
 	} else {
-		camera()->setType(Camera::PERSPECTIVE );
+		camera()->setType(qglviewer::Camera::PERSPECTIVE );
 	}
 
-};
-void Viewer::show_ortho_y(bool state)
-{
-	m_ortho_y = state;
-};
-void Viewer::show_ortho_z(bool state)
-{
-	m_ortho_z = state;
 };
