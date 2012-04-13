@@ -21,7 +21,7 @@
    <string>NEURON</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QGLViewer" name="viewer" native="true">
+   <widget class="QGLViewer" name="viewer">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -945,7 +945,7 @@
      <x>0</x>
      <y>0</y>
      <width>992</width>
-     <height>21</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -954,7 +954,6 @@
     </property>
     <addaction name="actionLoad"/>
     <addaction name="separator"/>
-    <addaction name="actionLoad_status"/>
     <addaction name="actionSave_Status"/>
     <addaction name="actionQuit"/>
    </widget>

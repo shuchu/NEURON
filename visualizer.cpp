@@ -92,11 +92,10 @@ void Viewer::draw()
     m_cm->draw_AABB();
   }
 
-  //glDisable(GL_BLEND);
-  //glBindTexture(GL_TEXTURE_2D,m_texture[1]);
-  //drawCubef(0.0,0.0,0.0,1.0,1.0,1.0);
-  //glutSolidCube(1.0);
-  //glEnable(GL_BLEND);
+  
+  glBindTexture(GL_TEXTURE_2D,m_texture[1]);
+  glutSolidCube(1.0);
+  
 
 
   //show different Cells
@@ -442,7 +441,7 @@ void Viewer::update_scene_radius()
 void Viewer::update_scene()
 {
 	this->build_frames();
-	this->update_scene_radius();
+	//this->update_scene_radius();
 };
 
 void Viewer::show_syn(int state)
@@ -508,6 +507,18 @@ void Viewer::load_texture()
 void Viewer::show_ortho_x(bool state)
 {
 	m_ortho_x = state;
+
+	//ok, orthogonal view of X
+	if (m_ortho_x) {
+	 //set view direction
+		setViewDirection(qglviewer::Vec(-1.0,0.0,0.0));
+		qglviewer::Vec v = viewDirection();
+		std::cout << "current view direction: " << v.x <<" "<< v.y << " " << v.z << std::endl;
+		camera()->setType(Camera::ORTHOGRAPHIC);
+	} else {
+		camera()->setType(Camera::PERSPECTIVE );
+	}
+
 };
 void Viewer::show_ortho_y(bool state)
 {
