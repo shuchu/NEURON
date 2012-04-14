@@ -190,7 +190,13 @@ class Soma
 class Nueron
 {
   public:
-    Nueron(){};
+    Nueron()
+	{
+	 m_id = 0;
+     m_type = 999;
+	 m_ctype = '@';
+	 m_selected = false;
+	};
     ~Nueron(){
       delete m_soma;
 
@@ -258,11 +264,18 @@ class Nueron
       return m_soma;
     }
 
+	
+
     //draw soma;
     void draw_soma()
     {
 		m_soma->draw();
     };
+
+	void draw()
+	{
+		draw_soma();
+	}
 
     void draw_dendrites()
     {
@@ -311,6 +324,16 @@ class Nueron
 		return m_ctype;
 	}
 
+	bool is_selected()
+	{
+		return m_selected;
+	};
+
+	void set_selected(bool v)
+	{
+		m_selected = v;
+	}
+
   private:
     // ouput and input synapses;
     std::vector<Synapse*>    m_output;
@@ -323,6 +346,7 @@ class Nueron
     int m_id;
     int m_type;
 	char m_ctype;
+	bool m_selected;
 };
 
 

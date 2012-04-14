@@ -24,7 +24,7 @@
    <string>NEURON</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QGLViewer" name="viewer" native="true">
+   <widget class="QGLViewer" name="viewer">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -50,7 +50,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>Settings</string>
+     <string>Show</string>
     </property>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
@@ -113,7 +113,7 @@
       <x>830</x>
       <y>90</y>
       <width>151</width>
-      <height>151</height>
+      <height>161</height>
      </rect>
     </property>
     <property name="title">
@@ -314,17 +314,30 @@
       <string>AABB box</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_snapshot">
+    <widget class="QCheckBox" name="checkBox_select">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>120</y>
-       <width>75</width>
-       <height>23</height>
+       <width>71</width>
+       <height>18</height>
       </rect>
      </property>
      <property name="text">
-      <string>Snapshot</string>
+      <string>Selection</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="checkBox_ortho">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>140</y>
+       <width>121</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Orthogonal View</string>
      </property>
     </widget>
    </widget>
@@ -768,32 +781,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QGroupBox" name="groupBox_2">
-    <property name="geometry">
-     <rect>
-      <x>830</x>
-      <y>240</y>
-      <width>151</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Orthogonal View</string>
-    </property>
-    <widget class="QCheckBox" name="checkBox_ortho">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>121</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Enable</string>
-     </property>
-    </widget>
-   </widget>
    <widget class="QGroupBox" name="groupBox_3">
     <property name="enabled">
      <bool>true</bool>
@@ -801,7 +788,7 @@
     <property name="geometry">
      <rect>
       <x>830</x>
-      <y>440</y>
+      <y>400</y>
       <width>151</width>
       <height>231</height>
      </rect>
@@ -946,13 +933,13 @@
     <property name="geometry">
      <rect>
       <x>830</x>
-      <y>300</y>
+      <y>260</y>
       <width>151</width>
       <height>131</height>
      </rect>
     </property>
     <property name="title">
-     <string>Rotate While freeze Axis</string>
+     <string>Rotate while freeze Axis</string>
     </property>
     <widget class="QSpinBox" name="spinBox_4">
      <property name="enabled">
@@ -960,11 +947,14 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>30</y>
+       <x>40</x>
+       <y>40</y>
        <width>42</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>-360</number>
      </property>
      <property name="maximum">
       <number>360</number>
@@ -976,11 +966,14 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>60</y>
+       <x>40</x>
+       <y>70</y>
        <width>42</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>-360</number>
      </property>
      <property name="maximum">
       <number>360</number>
@@ -995,11 +988,14 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>90</y>
+       <x>40</x>
+       <y>100</y>
        <width>42</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>-360</number>
      </property>
      <property name="maximum">
       <number>360</number>
@@ -1008,8 +1004,8 @@
     <widget class="QCheckBox" name="checkBox">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>30</y>
+       <x>10</x>
+       <y>40</y>
        <width>31</width>
        <height>17</height>
       </rect>
@@ -1021,8 +1017,8 @@
     <widget class="QCheckBox" name="checkBox_2">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>60</y>
+       <x>10</x>
+       <y>70</y>
        <width>31</width>
        <height>17</height>
       </rect>
@@ -1034,14 +1030,79 @@
     <widget class="QCheckBox" name="checkBox_3">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>90</y>
+       <x>10</x>
+       <y>100</y>
        <width>31</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
       <string>Z</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_rot_x">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>40</y>
+       <width>41</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Rotate</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_rot_y">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>70</y>
+       <width>41</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Rotate</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_rot_z">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>100</y>
+       <width>41</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Rotate</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Axis</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>20</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Scale</string>
      </property>
     </widget>
    </widget>
@@ -1052,7 +1113,7 @@
      <x>0</x>
      <y>0</y>
      <width>992</width>
-     <height>21</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

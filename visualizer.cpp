@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <bitset>
+#include <QMouseEvent>
 
 #include "visualizer.h"
 #include "cell.h"
@@ -13,6 +14,7 @@ Viewer::Viewer(QWidget* parent)	: QGLViewer(parent)
   m_den = 0;
   m_axon = 0;
   m_axis = true;
+  m_selected = false;
 
   m_magic_number = 0;
   m_P = 0; // 000000000001
@@ -86,43 +88,69 @@ void Viewer::init()
 
   //clip
   setManipulatedFrame(new qglviewer::ManipulatedFrame());
-
+ // manipulatedFrame()->setConstraint(new qglviewer::ManipulatedFrameSetConstraint());
   //setBackgroundColor(QColor(0,71,125));
   setTextIsEnabled(false);
 
   load_texture();
 };
 
+int Viewer::set_tex_id(int& type)
+{
+  int tex_id = 0;
+  switch (type) {
+    case 1:
+      tex_id = 0;break;
+    case 2:
+      tex_id = 1;break;
+    case 4:
+      tex_id = 2;break;
+    case 8:
+      tex_id = 3;break;
+    case 16:
+      tex_id = 4;break;
+    case 32:
+      tex_id = 5;break;
+    case 64:
+      tex_id = 6;break;
+    case 128:
+      tex_id = 7;break;
+    case 256:
+      tex_id = 8;break;
+    case 512:
+      tex_id = 9;break;
+    case 1024:
+      tex_id = 10;break;
+    case 2048:
+      tex_id = 11;break;
+    default:
+      tex_id = 0; break;
+  } //switch
+
+  return tex_id;
+}
 
 //main draw functions
 void Viewer::draw()
 {
-  //Point_3 length = m_cm->bbox_top_right() - m_cm->bbox_bottom_left();
-  //int max_length = length[0];
-  //if (max_length < length[1])
-  //  max_length = length[1];
-  //if (max_length < length[2])
-  //  max_length = length[2];
-
-  //float ss = (float) 1/ max_length;
-  ////glScalef(ss,ss,ss);
-
-  //show axis
-  if (true) {
-	glPushMatrix();
-	glMultMatrixd(manipulatedFrame()->matrix());
-	QGLViewer::drawAxis(sceneRadius() / 80.0); // Or any scale
-	glPopMatrix();
+  //draw axis
+  if (m_axis) {
+    glPushMatrix();
+    glMultMatrixd(manipulatedFrame()->matrix());
+    QGLViewer::drawAxis(sceneRadius() / 80.0); // Or any scale
+    glPopMatrix();
   }
-  
 
-  //show AABB 
+  //draw AABB 
   if( m_aabb != 0 ){
     glColor3f(1.0,1.0,1.0);
+    glPushMatrix();
+    glMultMatrixd(manipulatedFrame()->matrix());
     m_cm->draw_AABB();
+    glPopMatrix();
   }
 
-  //clipping plane
+  //set clipping plane
   glPushMatrix();
   glMultMatrixd(manipulatedFrame()->matrix());
   glClipPlane(GL_CLIP_PLANE0, m_clip_x);
@@ -130,106 +158,105 @@ void Viewer::draw()
   glClipPlane(GL_CLIP_PLANE2, m_clip_z);
   //draw clip planes
   //
-  glPopMatrix();
 
   //debug
   //glBindTexture(GL_TEXTURE_2D,m_texture[0]);
   //drawCubef(0.0,0.0,0.0,1.0,1.0,1.0);
 
-  //show different Cells
-  for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
-      ni != m_cm->nuerons_end(); ni++)
-  {
-    Nueron* n_ptr = *ni;
-    int type = (1 << n_ptr->type());
-    if (m_magic_number & type) {
-      int tex_id = 0;
-      switch (type) {
-        case 1:
-          //glColor4f(0.2,0.3,0.5,1.0); 
-          tex_id = 0;
-          break;
-        case 2:
-          //glColor4f(0.4,0.1,0.8,1.0); 
-          tex_id = 1;
-          break;
-        case 4:
-          //glColor4f(0.7,0.3,0.4,1.0); 
-          tex_id = 2;
-          break;
-        case 8:
-          //glColor4f(0.3,0.4,0.3,1.0); 
-          tex_id = 3;
-          break;
-        case 16:
-          //glColor4f(0.8,0.9,0.6,1.0); 
-          tex_id = 4;
-          break;
-        case 32:
-          //glColor4f(0.9,0.8,0.9,1.0); 
-          tex_id = 5;
-          break;
-        case 64:
-          //glColor4f(0.2,0.1,0.4,1.0); 
-          tex_id = 6;
-          break;
-        case 128:
-          //glColor4f(0.5,0.2,0.6,1.0); 
-          tex_id = 7;
-          break;
-        case 256:
-          //glColor4f(0.6,0.3,0.3,1.0); 
-          tex_id = 8;
-          break;
-        case 512:
-          //glColor4f(0.7,0.4,0.7,1.0); 
-          tex_id = 9;
-          break;
-        case 1024:
-          //glColor4f(0.1,0.5,0.4,1.0); 
-          tex_id = 10;
-          break;
-        case 2048:
-          //glColor4f(0.0,0.3,0.9,1.0); 
-          tex_id = 11;
-          break;
-        default:
-          //glColor4f(1.0,1.0,1.0,1.0); 
-          tex_id = 0; break;
-      }
-      //draw text
-      //glColor4f(1.0,1.0,1.0,1.0);
-      //qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
-      //drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
-      //Point_3 p = n_ptr->soma()->get_position();
-      //QGLWidget::renderText(p[0],p[1],p[2],(const QString)n_ptr->ctype());
+  if (m_selected) {
 
-      glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D,m_texture[tex_id]);
-      n_ptr->draw_soma();
-      glDisable(GL_TEXTURE_2D);
+    for (QList<int>::const_iterator it=selection_.begin(), end=selection_.end(); it != end; ++it){
+      Nueron* n_ptr = objects_.at(*it);
+      int type = (1 << n_ptr->type());
+      if (m_magic_number & type) {
+        int tex_id = set_tex_id(type);
+        //draw text
+        //glColor4f(1.0,1.0,1.0,1.0);
+        //qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
+        //drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
+        /*Point_3 p = n_ptr->soma()->get_position();
+          QGLWidget::renderText(p[0],p[1],p[2], QString(n_ptr->id()));*/
 
-      if (m_den){
-        glColor4f(0.0,1.0,0.0,1.0);
-        n_ptr->draw_dendrites();
-      }
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,m_texture[tex_id]);
+        n_ptr->draw_soma();
+        glDisable(GL_TEXTURE_2D);
 
-      if (m_axon){
-        glColor4f(0.0,0.0,1.0,1.0);
-        n_ptr->draw_axons();
-      }
+        if (m_den){
+          glColor4f(0.0,1.0,0.0,1.0);
+          n_ptr->draw_dendrites();
+        }
 
-      if (m_syn_in){
-        glColor4f(0.0,0.5,0.5,1.0);
-        n_ptr->draw_input_synapse(m_syn_via);
-      };
+        if (m_axon){
+          glColor4f(0.0,0.0,1.0,1.0);
+          n_ptr->draw_axons();
+        }
 
-      if (m_syn_out){
-        glColor4f(0.5,0.5,0.0,1.0);
-        n_ptr->draw_output_synapse(m_syn_via);
+        if (m_syn_in){
+          glColor4f(0.0,0.5,0.5,1.0);
+          n_ptr->draw_input_synapse(m_syn_via);
+        };
+
+        if (m_syn_out){
+          glColor4f(0.5,0.5,0.0,1.0);
+          n_ptr->draw_output_synapse(m_syn_via);
+        }
+      } //if
+    }//for
+
+  } else {
+
+    //show different Cells
+    for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
+        ni != m_cm->nuerons_end(); ni++)
+    {
+      Nueron* n_ptr = *ni;
+      int type = (1 << n_ptr->type());
+      if (m_magic_number & type) {
+        int tex_id = set_tex_id(type);
+        
+        //draw text
+        //glColor4f(1.0,1.0,1.0,1.0);
+        //qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
+        //drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
+        /*Point_3 p = n_ptr->soma()->get_position();
+          QGLWidget::renderText(p[0],p[1],p[2], QString(n_ptr->id()));*/
+
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,m_texture[tex_id]);
+        n_ptr->draw_soma();
+        glDisable(GL_TEXTURE_2D);
+
+        if (m_den){
+          glColor4f(0.0,1.0,0.0,1.0);
+          n_ptr->draw_dendrites();
+        }
+
+        if (m_axon){
+          glColor4f(0.0,0.0,1.0,1.0);
+          n_ptr->draw_axons();
+        }
+
+        if (m_syn_in){
+          glColor4f(0.0,0.5,0.5,1.0);
+          n_ptr->draw_input_synapse(m_syn_via);
+        };
+
+        if (m_syn_out){
+          glColor4f(0.5,0.5,0.0,1.0);
+          n_ptr->draw_output_synapse(m_syn_via);
+        }
       }
     }
-  }
+  }//else
+
+
+  glPopMatrix();
+
+  // Draws rectangular selection area. Could be done in postDraw() instead.
+  if (selectionMode_ != NONE)
+    drawSelectionRectangle();  
+
 }
 
 //help
@@ -462,49 +489,54 @@ void Viewer::update_scene_radius()
       radius = high[1] - low[1];
     if (radius < (high[2] - low[2]))
       radius = high[2] - low[2];
-    
-	//scene radius
-	setSceneRadius(double(radius));
+
+    //scene radius
+    setSceneRadius(double(radius));
     std::cout << "scene radius: " << sceneRadius() << std::endl;
 
-	//bounding box
-	//qglviewer::Vec b_min( (double)low[0],(double)low[1],(double)low[2]);
-	//qglviewer::Vec b_max( (double)high[0],(double)high[1],(double)high[2]);
+    //bounding box
+    //qglviewer::Vec b_min( (double)low[0],(double)low[1],(double)low[2]);
+    //qglviewer::Vec b_max( (double)high[0],(double)high[1],(double)high[2]);
     //setSceneBoundingBox(b_min,b_max);
-   
-	//update scene center
-	//qglviewer::Vec center(double(high[0]-low[0]),double(high[1]-low[1]),double(high[2]-low[2]));
-	//setSceneCenter(center);
-	
-	showEntireScene();
+
+    //update scene center
+    //qglviewer::Vec center(double(high[0]-low[0]),double(high[1]-low[1]),double(high[2]-low[2]));
+    //setSceneCenter(center);
+
+    showEntireScene();
   }
 };
 
 void Viewer::update_scene()
 {
-  this->build_frames();
+  //this->build_frames();
   this->update_scene_radius();
   this->update_aabb();
+  this->build_select_objects();
+  showEntireScene();
 };
 
 void Viewer::show_syn(int state)
 {
   m_syn = state;
+  updateGL();
 }; 
 
 void Viewer::show_syn_via(bool state)
 {
-  m_syn_via = state;
+  m_syn_via = state;updateGL();
 }; 
 
 void Viewer::show_syn_in(int state)
 {
   m_syn_in = state;
+  updateGL();
 }
 
 void Viewer::show_syn_out(int state)
 {
   m_syn_out = state;
+  updateGL();
 };
 
 void Viewer::load_status()
@@ -569,11 +601,11 @@ void Viewer::set_clip_x(int value)
   m_clip_x[3] -= 0.1f;
   m_clip_x[3] *= -1.0;
   std::cout << "Clipping plane X: "
-            << m_clip_x[0] << " "
-            << m_clip_x[1] << " "
-            << m_clip_x[2] << " "
-            << m_clip_x[3] << " "
-            <<std::endl;
+    << m_clip_x[0] << " "
+    << m_clip_x[1] << " "
+    << m_clip_x[2] << " "
+    << m_clip_x[3] << " "
+    <<std::endl;
 }
 
 void Viewer::set_clip_y(int value)
@@ -582,11 +614,11 @@ void Viewer::set_clip_y(int value)
   m_clip_y[3] -= 0.1f;
   m_clip_y[3] *= -1.0;
   std::cout << "Clipping plane Y: "
-            << m_clip_y[0] << " "
-            << m_clip_y[1] << " "
-            << m_clip_y[2] << " "
-            << m_clip_y[3] << " "
-            <<std::endl;
+    << m_clip_y[0] << " "
+    << m_clip_y[1] << " "
+    << m_clip_y[2] << " "
+    << m_clip_y[3] << " "
+    <<std::endl;
 }
 
 void Viewer::set_clip_z(int value)
@@ -595,11 +627,11 @@ void Viewer::set_clip_z(int value)
   m_clip_z[3] += 0.1f;
   m_clip_z[3] *= -1.0;
   std::cout << "Clipping plane Z: "
-            << m_clip_z[0] << " "
-            << m_clip_z[1] << " "
-            << m_clip_z[2] << " "
-            << m_clip_z[3] << " "
-            <<std::endl;
+    << m_clip_z[0] << " "
+    << m_clip_z[1] << " "
+    << m_clip_z[2] << " "
+    << m_clip_z[3] << " "
+    <<std::endl;
 }
 
 //update the AABB
@@ -614,9 +646,9 @@ void Viewer::update_aabb()
       aabb_high[i] = (double) high[i];
     }
 
-	m_clip_x[3] = low[0];
-	m_clip_y[3] = low[1];
-	m_clip_z[3] = low[2];
+    m_clip_x[3] = low[0];
+    m_clip_y[3] = low[1];
+    m_clip_z[3] = low[2];
   }
 }
 
@@ -641,63 +673,63 @@ void Viewer::show_clip_plane(bool flag)
 
 void Viewer::draw_corner_axis()
 {
-	int viewport[4];
-	int scissor[4];
+  int viewport[4];
+  int scissor[4];
 
-	// The viewport and the scissor are changed to fit the lower left
-	// corner. Original values are saved.
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	glGetIntegerv(GL_SCISSOR_BOX, scissor);
+  // The viewport and the scissor are changed to fit the lower left
+  // corner. Original values are saved.
+  glGetIntegerv(GL_VIEWPORT, viewport);
+  glGetIntegerv(GL_SCISSOR_BOX, scissor);
 
-	// Axis viewport size, in pixels
-	const int size = 150;
-	glViewport(0,0,size,size);
-	glScissor(0,0,size,size);
+  // Axis viewport size, in pixels
+  const int size = 150;
+  glViewport(0,0,size,size);
+  glScissor(0,0,size,size);
 
-	// The Z-buffer is cleared to make the axis appear over the
-	// original image.
-	glClear(GL_DEPTH_BUFFER_BIT);
+  // The Z-buffer is cleared to make the axis appear over the
+  // original image.
+  glClear(GL_DEPTH_BUFFER_BIT);
 
-	// Tune for best line rendering
-    glDisable(GL_LIGHTING);
-	glLineWidth(1.0);
+  // Tune for best line rendering
+  glDisable(GL_LIGHTING);
+  glLineWidth(1.0);
 
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(-1, 1, -1, 1, -1, 1);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(-1, 1, -1, 1, -1, 1);
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glMultMatrixd(camera()->orientation().inverse().matrix());
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+  glMultMatrixd(camera()->orientation().inverse().matrix());
 
 
-	glBegin(GL_LINES);
-	glColor3f(1.0, 0.0, 0.0);
-	glVertex3f(0.0, 0.0, 0.0);
-	glVertex3f(1.0, 0.0, 0.0);
+  glBegin(GL_LINES);
+  glColor3f(1.0, 0.0, 0.0);
+  glVertex3f(0.0, 0.0, 0.0);
+  glVertex3f(1.0, 0.0, 0.0);
 
-	glColor3f(0.0, 1.0, 0.0);
-	glVertex3f(0.0, 0.0, 0.0);
-	glVertex3f(0.0, 1.0, 0.0);
-	
-	glColor3f(0.0, 0.0, 1.0);
-	glVertex3f(0.0, 0.0, 0.0);
-	glVertex3f(0.0, 0.0, 1.0);
-	glEnd();
+  glColor3f(0.0, 1.0, 0.0);
+  glVertex3f(0.0, 0.0, 0.0);
+  glVertex3f(0.0, 1.0, 0.0);
 
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
+  glColor3f(0.0, 0.0, 1.0);
+  glVertex3f(0.0, 0.0, 0.0);
+  glVertex3f(0.0, 0.0, 1.0);
+  glEnd();
 
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
 
-	glEnable(GL_LIGHTING);
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
 
-	// The viewport and the scissor are restored.
-	glScissor(scissor[0],scissor[1],scissor[2],scissor[3]);
-	glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+  glEnable(GL_LIGHTING);
+
+  // The viewport and the scissor are restored.
+  glScissor(scissor[0],scissor[1],scissor[2],scissor[3]);
+  glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
 
 };
 
@@ -709,5 +741,204 @@ void Viewer::draw_corner_axis()
 
 void Viewer::show_axis(bool flag)
 {
-	m_axis = flag;
+  m_axis = flag;
 };
+
+//set rotatation scale (according to X axis)
+void Viewer::set_rot_x(int value)
+{
+  m_radius_x = (double) value * 2.0* M_PI / 360.0;
+}
+
+//set rotatation scale (according to Y axis)
+void Viewer::set_rot_y(int value)
+{
+  m_radius_y = (double) value * 2.0* M_PI / 360.0;
+}
+
+//set rotatation scale (according to Z axis)
+void Viewer::set_rot_z(int value)
+{
+  m_radius_z = (double) value * 2.0* M_PI / 360.0;
+}
+
+void Viewer::rotate_according_x()
+{
+  manipulatedFrame()->rotate(qglviewer::Quaternion(qglviewer::Vec(1.0,0.0,0.0),m_radius_x));
+  updateGL();
+};
+void Viewer::rotate_according_y()
+{
+  manipulatedFrame()->rotate(qglviewer::Quaternion(qglviewer::Vec(0.0,1.0,0.0),m_radius_y));
+  updateGL();
+};
+void Viewer::rotate_according_z()
+{
+  manipulatedFrame()->rotate(qglviewer::Quaternion(qglviewer::Vec(0.0,0.0,1.0),m_radius_z));
+  updateGL();
+};
+
+
+// Customized mouse events 
+void Viewer::mousePressEvent(QMouseEvent* e)
+{
+  // Start selection. Mode is ADD with Shift key and TOGGLE with Alt key.
+  rectangle_ = QRect(e->pos(), e->pos());
+
+  if ((e->button() == Qt::LeftButton) && (e->modifiers() == Qt::ShiftModifier))
+    selectionMode_ = ADD;
+  else
+    if ((e->button() == Qt::LeftButton) && (e->modifiers() == Qt::AltModifier))
+      selectionMode_ = REMOVE;
+    else
+    {
+      /*if (e->modifiers() == Qt::ControlModifier)      
+        startManipulation();*/
+      QGLViewer::mousePressEvent(e);
+    }
+}
+
+void Viewer::mouseMoveEvent(QMouseEvent* e)
+{
+  if (selectionMode_ != NONE)
+  {
+    // Updates rectangle_ coordinates and redraws rectangle
+    rectangle_.setBottomRight(e->pos());
+    updateGL();
+  }
+  else
+    QGLViewer::mouseMoveEvent(e);
+}
+
+void Viewer::mouseReleaseEvent(QMouseEvent* e)
+{
+  if (selectionMode_ != NONE)
+  {
+    // Actual selection on the rectangular area.
+    // Possibly swap left/right and top/bottom to make rectangle_ valid.
+    rectangle_ = rectangle_.normalized();
+    // Define selection window dimensions
+    setSelectRegionWidth(rectangle_.width());
+    setSelectRegionHeight(rectangle_.height());
+    // Compute rectangle center and perform selection
+    select(rectangle_.center());
+    // Update display to show new selected objects
+    updateGL();
+  }
+  else
+    QGLViewer::mouseReleaseEvent(e);
+}
+
+
+// processing
+void Viewer::drawWithNames()
+{
+  for (int i=0; i<int(objects_.size()); i++)
+  {
+    glPushName(i);
+    objects_.at(i)->draw();
+    glPopName();
+  }
+}
+
+void Viewer::endSelection(const QPoint&)
+{
+  // Flush GL buffers
+  glFlush();
+
+  // Get the number of objects that were seen through the pick matrix frustum. Reset GL_RENDER mode.
+  GLint nbHits = glRenderMode(GL_RENDER);
+
+  if (nbHits > 0)
+  {
+    // Interpret results : each object created 4 values in the selectBuffer().
+    // (selectBuffer())[4*i+3] is the id pushed on the stack.
+    for (int i=0; i<nbHits; ++i)
+      switch (selectionMode_)
+      {
+        case ADD    : addIdToSelection((selectBuffer())[4*i+3]); break;
+        case REMOVE : removeIdFromSelection((selectBuffer())[4*i+3]);  break;
+        default : break;
+      }
+  }
+  selectionMode_ = NONE;
+}
+
+void Viewer::startManipulation()
+{
+  /*Vec averagePosition;
+  ManipulatedFrameSetConstraint* mfsc = (ManipulatedFrameSetConstraint*)(manipulatedFrame()->constraint());
+  mfsc->clearSet();
+
+  for (QList<int>::const_iterator it=selection_.begin(), end=selection_.end(); it != end; ++it)
+  {
+    mfsc->addObjectToSet(objects_[*it]);
+    averagePosition += objects_[*it]->frame.position();
+  }
+
+  if (selection_.size() > 0)
+    manipulatedFrame()->setPosition(averagePosition / selection_.size());*/
+}
+
+
+//tools 
+
+void Viewer::addIdToSelection(int id)
+{
+  if (!selection_.contains(id))
+    selection_.push_back(id);
+}
+
+void Viewer::removeIdFromSelection(int id)
+{
+  selection_.removeAll(id);
+}
+
+void Viewer::drawSelectionRectangle() const
+{
+  startScreenCoordinatesSystem();
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND);
+
+  glColor4f(0.0, 0.0, 0.3f, 0.3f);
+  glBegin(GL_QUADS);
+  glVertex2i(rectangle_.left(),  rectangle_.top());
+  glVertex2i(rectangle_.right(), rectangle_.top());
+  glVertex2i(rectangle_.right(), rectangle_.bottom());
+  glVertex2i(rectangle_.left(),  rectangle_.bottom());
+  glEnd();
+
+  glLineWidth(2.0);
+  glColor4f(0.4f, 0.4f, 0.5f, 0.5f);
+  glBegin(GL_LINE_LOOP);
+  glVertex2i(rectangle_.left(),  rectangle_.top());
+  glVertex2i(rectangle_.right(), rectangle_.top());
+  glVertex2i(rectangle_.right(), rectangle_.bottom());
+  glVertex2i(rectangle_.left(),  rectangle_.bottom());
+  glEnd();
+
+  glDisable(GL_BLEND);
+  glEnable(GL_LIGHTING);
+  stopScreenCoordinatesSystem();
+}
+
+void Viewer::build_select_objects()
+{
+  std::cout << "starting build selected object buffer.... " << std::endl;
+  if (m_cm != NULL) {
+    objects_.reserve(m_cm->size_of_nuerons()); //reserve spave
+    for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
+        ni != m_cm->nuerons_end(); ++ni){
+      Nueron* n_ptr = *ni;
+      objects_.insert(n_ptr->id(),n_ptr);
+    }
+  }
+  std::cout << "finish the building of selected buffer" << std::endl;
+}
+
+void Viewer::show_selected(bool flag)
+{
+  m_selected = flag; 
+}
+
+

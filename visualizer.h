@@ -4,6 +4,10 @@
 #include "QGLViewer/qglviewer.h"
 #include "CellModel.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 class Viewer : public QGLViewer
 {
   Q_OBJECT
@@ -19,11 +23,13 @@ class Viewer : public QGLViewer
     void update_scene();
     void load_texture(); // load texture
     void update_aabb();
-	void draw_corner_axis();
+    void draw_corner_axis();
+    void build_select_objects();
+    int set_tex_id(int& type);
 
   protected:
     virtual void draw();
-	//virtual void postDraw();
+    //virtual void postDraw();
     //virtual void fastDraw();
     virtual void init();
     virtual QString helpString() const;
@@ -62,16 +68,55 @@ class Viewer : public QGLViewer
     void set_clip_z(int value);
     void enable_clip_plane(bool flag);
     void show_clip_plane(bool flag);
-	void show_axis(bool flag);
+    void show_axis(bool flag);
+    void set_rot_x(int value);
+    void set_rot_y(int value);
+    void set_rot_z(int value);
+    void rotate_according_x();
+    void rotate_according_y();
+    void rotate_according_z();
+    void show_selected(bool flag);
+
+    // Selection functions
+    virtual void drawWithNames();
+    virtual void endSelection(const QPoint&);
+
+    // Mouse events functions
+    virtual void mousePressEvent(QMouseEvent *e);
+    virtual void mouseMoveEvent(QMouseEvent *e);
+    virtual void mouseReleaseEvent(QMouseEvent *e);
 
   private: 
+    ///////////////////////////////////////////
+    //selection function
+    void startManipulation();
+    void drawSelectionRectangle() const;
+    void addIdToSelection(int id);
+    void removeIdFromSelection(int id);
+
+    // Current rectangular selection
+    QRect rectangle_;
+
+    // Different selection modes
+    enum SelectionMode { NONE, ADD, REMOVE };
+    SelectionMode selectionMode_;
+    QList<Nueron*> objects_;
+    QList<int> selection_;
+    bool m_selected;
+    ///////////////////////////////////////////
+
     CellModel * m_cm;
     qglviewer::Frame *m_frames;
     GLuint m_texture[12];
 
-	// axis
-	bool m_axis;
-    
+    //axis
+    bool m_axis;
+
+    //rotate x
+    double m_radius_x;
+    double m_radius_y;
+    double m_radius_z;
+
     //bounding box
     double aabb_low[3];
     double aabb_high[3];
