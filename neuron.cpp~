@@ -15,6 +15,11 @@ NEURON::NEURON(QWidget *parent, Qt::WFlags flags)
 	ui.setupUi(this);
 	ui.textEdit->setReadOnly(true);
 	qout = new QDebugStream(std::cout,ui.textEdit);
+	
+
+	//redirect the std::clog buffer
+	/*logBuf.open("./log.txt");
+	std::cout.rdbuf(logBuf.rdbuf());*/
 
 	//create model
 	cellModel = new CellModel();
@@ -53,16 +58,15 @@ NEURON::NEURON(QWidget *parent, Qt::WFlags flags)
         connect(ui.verticalSlider_x, SIGNAL(sliderMoved(int)), ui.viewer, SLOT(set_clip_x(int))); // clip X
         connect(ui.verticalSlider_y, SIGNAL(sliderMoved(int)), ui.viewer, SLOT(set_clip_y(int))); // clip X
         connect(ui.verticalSlider_z, SIGNAL(sliderMoved(int)), ui.viewer, SLOT(set_clip_z(int))); // clip X
-        connect(ui.spinBox,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_clip_x(int))); //clip
-        connect(ui.spinBox_2,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_clip_y(int)));
-        connect(ui.spinBox_3,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_clip_z(int)));
-        connect(ui.spinBox_4,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_rot_x(int))); //rotate scale
-        connect(ui.spinBox_5,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_rot_y(int)));
-        connect(ui.spinBox_6,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_rot_z(int)));
-        connect(ui.pushButton_rot_x,SIGNAL(clicked()),ui.viewer,SLOT(rotate_according_x())); //rotate action
-        connect(ui.pushButton_rot_y,SIGNAL(clicked()),ui.viewer,SLOT(rotate_according_y()));
-        connect(ui.pushButton_rot_z,SIGNAL(clicked()),ui.viewer,SLOT(rotate_according_z()));
-        connect(ui.checkBox_select,SIGNAL(clicked(bool)),ui.viewer, SLOT(show_selected(bool))); //selection option 
+		connect(ui.spinBox,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_clip_x(int))); //clip
+		connect(ui.spinBox_2,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_clip_y(int)));
+		connect(ui.spinBox_3,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_clip_z(int)));
+		connect(ui.spinBox_4,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_rot_x(int))); //rotate scale
+		connect(ui.spinBox_5,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_rot_y(int)));
+		connect(ui.spinBox_6,SIGNAL(valueChanged(int)),ui.viewer,SLOT(set_rot_z(int)));
+		connect(ui.pushButton_rot_x,SIGNAL(clicked()),ui.viewer,SLOT(rotate_according_x())); //rotate action
+		connect(ui.pushButton_rot_y,SIGNAL(clicked()),ui.viewer,SLOT(rotate_according_y()));
+		connect(ui.pushButton_rot_z,SIGNAL(clicked()),ui.viewer,SLOT(rotate_according_z()));
 }
 
 NEURON::~NEURON()

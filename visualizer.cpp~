@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <bitset>
-#include <QMouseEvent>
 
 #include "visualizer.h"
 #include "cell.h"
@@ -14,7 +13,7 @@ Viewer::Viewer(QWidget* parent)	: QGLViewer(parent)
   m_den = 0;
   m_axon = 0;
   m_axis = true;
-  m_selected = false;
+  m_select = false;
 
   m_magic_number = 0;
   m_P = 0; // 000000000001
@@ -78,14 +77,6 @@ void Viewer::init()
   glLightfv(GL_LIGHT0,GL_POSITION,pos);
   glEnable(GL_LIGHT0);
 
-  //1
-  GLfloat pos1[4] = {-1000.0,-1000.0,-1000.0,0.0};
-  glLightfv(GL_LIGHT1,GL_AMBIENT,ka);
-  glLightfv(GL_LIGHT1,GL_DIFFUSE,kd);
-  glLightfv(GL_LIGHT1,GL_SPECULAR,ks);
-  glLightfv(GL_LIGHT1,GL_POSITION,pos1);
-  glEnable(GL_LIGHT1);
-
   //texture
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
@@ -96,47 +87,13 @@ void Viewer::init()
 
   //clip
   setManipulatedFrame(new qglviewer::ManipulatedFrame());
- // manipulatedFrame()->setConstraint(new qglviewer::ManipulatedFrameSetConstraint());
+  manipulatedFrame()->setConstraint(new ManipulatedFrameSetConstraint());
   //setBackgroundColor(QColor(0,71,125));
   setTextIsEnabled(false);
 
   load_texture();
 };
 
-int Viewer::set_tex_id(int& type)
-{
-  int tex_id = 0;
-  switch (type) {
-    case 1:
-      tex_id = 0;break;
-    case 2:
-      tex_id = 1;break;
-    case 4:
-      tex_id = 2;break;
-    case 8:
-      tex_id = 3;break;
-    case 16:
-      tex_id = 4;break;
-    case 32:
-      tex_id = 5;break;
-    case 64:
-      tex_id = 6;break;
-    case 128:
-      tex_id = 7;break;
-    case 256:
-      tex_id = 8;break;
-    case 512:
-      tex_id = 9;break;
-    case 1024:
-      tex_id = 10;break;
-    case 2048:
-      tex_id = 11;break;
-    default:
-      tex_id = 0; break;
-  } //switch
-
-  return tex_id;
-}
 
 //main draw functions
 void Viewer::draw()
@@ -171,92 +128,100 @@ void Viewer::draw()
   //glBindTexture(GL_TEXTURE_2D,m_texture[0]);
   //drawCubef(0.0,0.0,0.0,1.0,1.0,1.0);
 
-  if (m_selected) {
+  //show different Cells
+  for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
+      ni != m_cm->nuerons_end(); ni++)
+  {
+    Nueron* n_ptr = *ni;
+    int type = (1 << n_ptr->type());
+    if (m_magic_number & type) {
+      int tex_id = 0;
+      switch (type) {
+        case 1:
+          //glColor4f(0.2,0.3,0.5,1.0); 
+          tex_id = 0;
+          break;
+        case 2:
+          //glColor4f(0.4,0.1,0.8,1.0); 
+          tex_id = 1;
+          break;
+        case 4:
+          //glColor4f(0.7,0.3,0.4,1.0); 
+          tex_id = 2;
+          break;
+        case 8:
+          //glColor4f(0.3,0.4,0.3,1.0); 
+          tex_id = 3;
+          break;
+        case 16:
+          //glColor4f(0.8,0.9,0.6,1.0); 
+          tex_id = 4;
+          break;
+        case 32:
+          //glColor4f(0.9,0.8,0.9,1.0); 
+          tex_id = 5;
+          break;
+        case 64:
+          //glColor4f(0.2,0.1,0.4,1.0); 
+          tex_id = 6;
+          break;
+        case 128:
+          //glColor4f(0.5,0.2,0.6,1.0); 
+          tex_id = 7;
+          break;
+        case 256:
+          //glColor4f(0.6,0.3,0.3,1.0); 
+          tex_id = 8;
+          break;
+        case 512:
+          //glColor4f(0.7,0.4,0.7,1.0); 
+          tex_id = 9;
+          break;
+        case 1024:
+          //glColor4f(0.1,0.5,0.4,1.0); 
+          tex_id = 10;
+          break;
+        case 2048:
+          //glColor4f(0.0,0.3,0.9,1.0); 
+          tex_id = 11;
+          break;
+        default:
+          //glColor4f(1.0,1.0,1.0,1.0); 
+          tex_id = 0; break;
+      }
+      //draw text
+      //glColor4f(1.0,1.0,1.0,1.0);
+      //qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
+      //drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
+      /*Point_3 p = n_ptr->soma()->get_position();
+        QGLWidget::renderText(p[0],p[1],p[2], QString(n_ptr->id()));*/
 
-    for (QList<int>::const_iterator it=selection_.begin(), end=selection_.end(); it != end; ++it){
-      Nueron* n_ptr = objects_.at(*it);
-      int type = (1 << n_ptr->type());
-      if (m_magic_number & type) {
-        int tex_id = set_tex_id(type);
-        //draw text
-        //glColor4f(1.0,1.0,1.0,1.0);
-        //qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
-        //drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
-        /*Point_3 p = n_ptr->soma()->get_position();
-          QGLWidget::renderText(p[0],p[1],p[2], QString(n_ptr->id()));*/
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D,m_texture[tex_id]);
+      n_ptr->draw_soma();
+      glDisable(GL_TEXTURE_2D);
 
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D,m_texture[tex_id]);
-        n_ptr->draw_soma();
-        glDisable(GL_TEXTURE_2D);
+      if (m_den){
+        glColor4f(0.0,1.0,0.0,1.0);
+        n_ptr->draw_dendrites();
+      }
 
-        if (m_den){
-          glColor4f(0.0,1.0,0.0,1.0);
-          n_ptr->draw_dendrites();
-        }
+      if (m_axon){
+        glColor4f(0.0,0.0,1.0,1.0);
+        n_ptr->draw_axons();
+      }
 
-        if (m_axon){
-          glColor4f(0.0,0.0,1.0,1.0);
-          n_ptr->draw_axons();
-        }
+      if (m_syn_in){
+        glColor4f(0.0,0.5,0.5,1.0);
+        n_ptr->draw_input_synapse(m_syn_via);
+      };
 
-        if (m_syn_in){
-          glColor4f(0.0,0.5,0.5,1.0);
-          n_ptr->draw_input_synapse(m_syn_via);
-        };
-
-        if (m_syn_out){
-          glColor4f(0.5,0.5,0.0,1.0);
-          n_ptr->draw_output_synapse(m_syn_via);
-        }
-      } //if
-    }//for
-
-  } else {
-
-    //show different Cells
-    for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
-        ni != m_cm->nuerons_end(); ni++)
-    {
-      Nueron* n_ptr = *ni;
-      int type = (1 << n_ptr->type());
-      if (m_magic_number & type) {
-        int tex_id = set_tex_id(type);
-        
-        //draw text
-        //glColor4f(1.0,1.0,1.0,1.0);
-        //qglviewer::Vec screenPos = camera()->projectedCoordinatesOf(m_frames[n_ptr->id()].position());
-        //drawText((int)screenPos[0],(int)screenPos[1],(const QString)m_cm->nueron_type(n_ptr->type()));
-        /*Point_3 p = n_ptr->soma()->get_position();
-          QGLWidget::renderText(p[0],p[1],p[2], QString(n_ptr->id()));*/
-
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D,m_texture[tex_id]);
-        n_ptr->draw_soma();
-        glDisable(GL_TEXTURE_2D);
-
-        if (m_den){
-          glColor4f(0.0,1.0,0.0,1.0);
-          n_ptr->draw_dendrites();
-        }
-
-        if (m_axon){
-          glColor4f(0.0,0.0,1.0,1.0);
-          n_ptr->draw_axons();
-        }
-
-        if (m_syn_in){
-          glColor4f(0.0,0.5,0.5,1.0);
-          n_ptr->draw_input_synapse(m_syn_via);
-        };
-
-        if (m_syn_out){
-          glColor4f(0.5,0.5,0.0,1.0);
-          n_ptr->draw_output_synapse(m_syn_via);
-        }
+      if (m_syn_out){
+        glColor4f(0.5,0.5,0.0,1.0);
+        n_ptr->draw_output_synapse(m_syn_via);
       }
     }
-  }//else
+  }
 
 
   glPopMatrix();
@@ -800,8 +765,8 @@ void Viewer::mousePressEvent(QMouseEvent* e)
       selectionMode_ = REMOVE;
     else
     {
-      /*if (e->modifiers() == Qt::ControlModifier)      
-        startManipulation();*/
+      if (e->modifiers() == Qt::ControlModifier)      
+        startManipulation();
       QGLViewer::mousePressEvent(e);
     }
 }
@@ -874,7 +839,7 @@ void Viewer::endSelection(const QPoint&)
 
 void Viewer::startManipulation()
 {
-  /*Vec averagePosition;
+  Vec averagePosition;
   ManipulatedFrameSetConstraint* mfsc = (ManipulatedFrameSetConstraint*)(manipulatedFrame()->constraint());
   mfsc->clearSet();
 
@@ -885,7 +850,7 @@ void Viewer::startManipulation()
   }
 
   if (selection_.size() > 0)
-    manipulatedFrame()->setPosition(averagePosition / selection_.size());*/
+    manipulatedFrame()->setPosition(averagePosition / selection_.size());
 }
 
 
@@ -934,9 +899,9 @@ void Viewer::build_select_objects()
 {
   std::cout << "starting build selected object buffer.... " << std::endl;
   if (m_cm != NULL) {
-    objects_.reserve(m_cm->size_of_nuerons()); //reserve spave
+    objects_.reserve(m_cm->num_of_cells()); //reserve spave
     for (CellModel::Nueron_iterator ni = m_cm->nuerons_begin();
-        ni != m_cm->nuerons_end(); ++ni){
+         ni != m_cm->nuerons_end(); ++ni){
       Nueron* n_ptr = *ni;
       objects_.insert(n_ptr->id(),n_ptr);
     }
@@ -946,7 +911,7 @@ void Viewer::build_select_objects()
 
 void Viewer::show_selected(bool flag)
 {
-  m_selected = flag; 
+ m_selected = flag; 
 }
 
 
